@@ -1,7 +1,7 @@
 {
-  "author": "Vadim Graboys <dimva13@gmail.com>",
-  "name": "bintrees",
-  "description": "Binary Search Trees",
+  "author": "Chris Gomez <chris_gomez@bitovi.com>",
+  "name": "can-redblacktree",
+  "description": "Bindable red-black binary search trees in CanJS",
   "version": "1.0.0",
   "keywords": [
     "binary tree",
@@ -11,7 +11,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/vadimg/js_bintrees.git"
+    "url": "git://github.com/akagomez/can-redblacktree.git"
   },
   "directories": {
     "lib": "lib"
