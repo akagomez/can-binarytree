@@ -83,7 +83,7 @@ function run_test(assert, tree_assert, tree_class, test_path) {
     tests.forEach(function(n) {
         if(n > 0) {
             // insert
-            assert.ok(tree.insert(n));
+            assert.notEqual(tree.insert(n), -1);
             assert.equal(tree.find(n), n);
             elems++;
         }

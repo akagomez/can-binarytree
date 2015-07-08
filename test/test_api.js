@@ -17,14 +17,14 @@ function clear(assert, tree_class) {
 function dup(assert, tree_class) {
     var tree = loader.new_tree(tree_class);
 
-    assert.ok(tree.insert(100));
-    assert.ok(tree.insert(101));
-    assert.ok(!tree.insert(101));
-    assert.ok(!tree.insert(100));
+    assert.equal(tree.insert(100), 0);
+    assert.equal(tree.insert(101), 1);
+    assert.equal(tree.insert(101), -1);
+    assert.equal(tree.insert(100), -1);
     tree.remove(100);
-    assert.ok(!tree.insert(101));
-    assert.ok(tree.insert(100));
-    assert.ok(!tree.insert(100));
+    assert.equal(tree.insert(101), -1);
+    assert.equal(tree.insert(100), 0);
+    assert.equal(tree.insert(100), -1);
 }
 
 function nonexist(assert, tree_class) {

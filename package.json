@@ -5,6 +5,8 @@
   "version": "1.0.0",
   "keywords": [
     "binary tree",
+    "canjs",
+    "can",
     "red black tree",
     "red-black tree",
     "redblack tree"
@@ -21,6 +23,8 @@
     "test": "nodeunit ./test/test_*.js && jshint lib/*.js index.js"
   },
   "dependencies": {
+    "steal": "^0.10.1",
+    "steal-qunit": "0.0.2"
   },
   "devDependencies": {
     "nodeunit": "0.7.4",
