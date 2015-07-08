@@ -20,16 +20,16 @@
   },
   "main": "./index.js",
   "scripts": {
-    "test": "nodeunit ./test/test_*.js && jshint lib/*.js index.js"
+    "test": "testee test/index.html && nodeunit ./test/test_*.js && jshint lib/*.js index.js"
   },
-  "dependencies": {
-    "steal": "^0.10.1",
-    "steal-qunit": "0.0.2"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "nodeunit": "0.7.4",
     "jshint": "0.5.9",
-    "underscore": "1.3.1",
-    "reunion": "0.0.0"
+    "nodeunit": "0.7.4",
+    "reunion": "0.0.0",
+    "steal": "^0.10.1",
+    "steal-qunit": "0.0.2",
+    "testee": "^0.2.0",
+    "underscore": "1.3.1"
   }
 }
