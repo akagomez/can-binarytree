@@ -30,10 +30,10 @@ function dup(assert, tree_class) {
 function nonexist(assert, tree_class) {
     var tree = loader.new_tree(tree_class);
 
-    assert.ok(!tree.remove(100));
+    assert.equal(tree.remove(100), -1);
     tree.insert(100);
-    assert.ok(!tree.remove(101));
-    assert.ok(tree.remove(100));
+    assert.equal(tree.remove(101), -1);
+    assert.equal(tree.remove(100), 0);
 }
 
 function minmax(assert, tree_class) {

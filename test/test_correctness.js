@@ -90,7 +90,7 @@ function run_test(assert, tree_assert, tree_class, test_path) {
         else {
             // remove
             n = -n;
-            assert.ok(tree.remove(n));
+            assert.notEqual(tree.remove(n), -1);
             assert.equal(tree.find(n), null);
             elems--;
         }

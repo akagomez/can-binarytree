@@ -32,7 +32,7 @@ test('Sort by key', function () {
     });
 });
 
-test('Calculate index on insert (without rebalance)', 3, function () {
+test('Return index on insert (without rebalance)', 3, function () {
     var comparator = function (a, b) {
         a = a.value.charCodeAt(0);
         b = b.value.charCodeAt(0);
@@ -72,7 +72,7 @@ test('Calculate index on insert (without rebalance)', 3, function () {
     });
 });
 
-test('Calculate index on insert (with rebalance, singleRotate only)', 8, function () {
+test('Return index on insert (with rebalance, singleRotate only)', 9, function () {
     var comparator = function (a, b) {
         a = a.value.charCodeAt(0);
         b = b.value.charCodeAt(0);
@@ -116,13 +116,14 @@ test('Calculate index on insert (with rebalance, singleRotate only)', 8, functio
 
     items.forEach(function (item, index) {
         var insertIndex = tree.insert(item);
-
-        equal(insertIndex, item.insertIndex, 'Insert index reported correctly');
+        equal(insertIndex, item.insertIndex, 'Returned correct insert index');
     });
+
+    var insertIndex = tree.insert(items[0]);
+    equal(insertIndex, -1, 'Returned "not inserted" value');
 });
 
-
-test('Calculate index on insert (with rebalance, single and doubleRotate)', 5, function () {
+test('Return index on insert (with rebalance, single and doubleRotate)', 6, function () {
     var comparator = function (a, b) {
         a = a.value.charCodeAt(0);
         b = b.value.charCodeAt(0);
@@ -166,8 +167,42 @@ test('Calculate index on insert (with rebalance, single and doubleRotate)', 5, f
 
     items.forEach(function (item, index) {
         var insertIndex = tree.insert(item);
-
-        equal(insertIndex, item.insertIndex, 'Insert index reported correctly');
+        equal(insertIndex, item.insertIndex, 'Returned correct insert index');
     });
+
+    var insertIndex = tree.insert(items[0]);
+    equal(insertIndex, -1, 'Returned "not inserted" value');
 });
 
+test('Return index on remove', function () {
+    var comparator = function (a, b) {
+        a = a.value.charCodeAt(0);
+        b = b.value.charCodeAt(0);
+        return a === b ? 0 : a < b ? -1 : 1; // ASC
+    };
+
+    var tree = new RBTree(comparator);
+
+    var items = [
+        { value: 'A', removedIndex: 0 },
+        { value: 'B', removedIndex: 1 },
+        { value: 'C', removedIndex: 2 },
+        { value: 'D', removedIndex: 3 },
+        { value: 'E', removedIndex: 3 },
+        { value: 'F', removedIndex: 3 },
+        { value: 'G', removedIndex: 3 }
+    ];
+
+    items.forEach(function (item, index) {
+        tree.insert(item);
+    });
+
+    [3, 4, 5, 6, 2, 1, 0].forEach(function (itemIndex) {
+        var item = items[itemIndex];
+        var removedIndex = tree.remove(item);
+        equal(removedIndex, item.removedIndex, 'Returned correct removal index')
+        tree.print();
+    });
+
+    equal(tree.remove(items[0]), -1, 'Returned correct "not found" value');
+});
