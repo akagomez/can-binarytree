@@ -143,3 +143,34 @@ test('Return index on remove', function () {
     equal(tree.remove(items[2]), 0, 'Returned correct remove index');
     equal(tree.remove(items[0]), -1, 'Returned "not found" value');
 });
+
+test('Get index', function () {
+    var comparator = function (a, b) {
+        a = a.charCodeAt(0);
+        b = b.charCodeAt(0);
+        return a === b ? 0 : a < b ? -1 : 1; // ASC
+    };
+
+    var tree = new RBTree(comparator);
+
+    tree.insert('A');
+    tree.insert('B');
+    tree.insert('C');
+
+    equal(tree.index('A'), 0, 'Returned correct index');
+    equal(tree.index('B'), 1, 'Returned correct index');
+    equal(tree.index('C'), 2, 'Returned correct index');
+    equal(tree.index('404'), -1, 'Returned "not found" value');
+
+    tree.insert('D')
+    equal(tree.index('D'), 3, 'Returned correct index');
+
+    tree.insert('G')
+    equal(tree.index('G'), 4, 'Returned correct index');
+
+    tree.insert('F')
+    equal(tree.index('F'), 4, 'Returned correct index');
+
+    tree.insert('G')
+    equal(tree.index('G'), 5, 'Returned correct index');
+});
