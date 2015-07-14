@@ -144,7 +144,7 @@ test('Return index on remove', function () {
     equal(tree.remove(items[0]), -1, 'Returned "not found" value');
 });
 
-test('Get index', function () {
+test('Get index of item', function () {
     var comparator = function (a, b) {
         a = a.charCodeAt(0);
         b = b.charCodeAt(0);
@@ -157,19 +157,19 @@ test('Get index', function () {
     tree.insert('B');
     tree.insert('C');
 
-    equal(tree.index('A'), 0, 'Returned correct index');
-    equal(tree.index('B'), 1, 'Returned correct index');
-    equal(tree.index('C'), 2, 'Returned correct index');
-    equal(tree.index('404'), -1, 'Returned "not found" value');
+    equal(tree.findIndex('A'), 0, 'Returned correct index');
+    equal(tree.findIndex('B'), 1, 'Returned correct index');
+    equal(tree.findIndex('C'), 2, 'Returned correct index');
+    equal(tree.findIndex('404'), -1, 'Returned "not found" value');
 
-    tree.insert('D')
-    equal(tree.index('D'), 3, 'Returned correct index');
+    tree.insert('D');
+    equal(tree.findIndex('D'), 3, 'Returned correct index');
 
-    tree.insert('G')
-    equal(tree.index('G'), 4, 'Returned correct index');
+    tree.insert('G');
+    equal(tree.findIndex('G'), 4, 'Returned correct index');
 
-    tree.insert('F')
-    equal(tree.index('F'), 4, 'Returned correct index');
+    tree.insert('F');
+    equal(tree.findIndex('F'), 4, 'Returned correct index');
 
     tree.insert('G')
     equal(tree.index('G'), 5, 'Returned correct index');
