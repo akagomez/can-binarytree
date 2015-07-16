@@ -53,12 +53,15 @@ function forward_it(assert, tree_class) {
     var tree = loader.build_tree(tree_class, inserts);
 
     var items = [];
-    var it=tree.iterator(), data;
-    while((data = it.next()) !== null) {
+    var it = tree.iterator(),
+        data;
+    while ((data = it.next()) !== null) {
         items.push(data);
     }
 
-    inserts.sort(function(a,b) { return a - b; });
+    inserts.sort(function(a, b) {
+        return a - b;
+    });
 
     assert.deepEqual(items, inserts);
 
@@ -76,12 +79,15 @@ function reverse_it(assert, tree_class) {
 
     var items = [];
 
-    var it=tree.iterator(), data;
-    while((data = it.prev()) !== null) {
+    var it = tree.iterator(),
+        data;
+    while ((data = it.prev()) !== null) {
         items.push(data);
     }
 
-    inserts.sort(function(a,b) { return b - a; });
+    inserts.sort(function(a, b) {
+        return b - a;
+    });
 
     assert.deepEqual(items, inserts);
 
@@ -97,16 +103,18 @@ function switch_it(assert, tree_class) {
     var inserts = loader.get_inserts(loader.load(SAMPLE_FILE));
     var tree = loader.build_tree(tree_class, inserts);
 
-    inserts.sort(function(a,b) { return a - b; });
+    inserts.sort(function(a, b) {
+        return a - b;
+    });
 
     function do_switch(after) {
         var items = [];
         var it = tree.iterator();
-        for(var i = 0; i < after; i++) {
+        for (var i = 0; i < after; i++) {
             items.push(it.next());
         }
 
-        while((data = it.prev()) !== null) {
+        while ((data = it.prev()) !== null) {
             items.push(data);
         }
 
@@ -137,22 +145,24 @@ function lower_bound(assert, tree_class) {
     var inserts = loader.get_inserts(loader.load(SAMPLE_FILE));
     var tree = loader.build_tree(tree_class, inserts);
 
-    inserts.sort(function(a,b) { return a - b; });
+    inserts.sort(function(a, b) {
+        return a - b;
+    });
 
-    for(var i=1; i<inserts.length-1; ++i) {
+    for (var i = 1; i < inserts.length - 1; ++i) {
         var item = inserts[i];
 
         var iter = tree.lowerBound(item);
         assert.equal(iter.data(), item);
-        assert.equal(iter.prev(), inserts[i-1]);
+        assert.equal(iter.prev(), inserts[i - 1]);
         iter.next();
-        assert.equal(iter.next(), inserts[i+1]);
+        assert.equal(iter.next(), inserts[i + 1]);
 
         var prev = tree.lowerBound(item - 0.1);
         assert.equal(prev.data(), inserts[i]);
 
         var next = tree.lowerBound(item + 0.1);
-        assert.equal(next.data(), inserts[i+1]);
+        assert.equal(next.data(), inserts[i + 1]);
     }
 
     // test edges
@@ -169,22 +179,24 @@ function upper_bound(assert, tree_class) {
     var inserts = loader.get_inserts(loader.load(SAMPLE_FILE));
     var tree = loader.build_tree(tree_class, inserts);
 
-    inserts.sort(function(a,b) { return a - b; });
+    inserts.sort(function(a, b) {
+        return a - b;
+    });
 
-    for(var i=0; i<inserts.length-2; ++i) {
+    for (var i = 0; i < inserts.length - 2; ++i) {
         var item = inserts[i];
 
         var iter = tree.upperBound(item);
-        assert.equal(iter.data(), inserts[i+1]);
+        assert.equal(iter.data(), inserts[i + 1]);
         assert.equal(iter.prev(), inserts[i]);
         iter.next();
-        assert.equal(iter.next(), inserts[i+2]);
+        assert.equal(iter.next(), inserts[i + 2]);
 
         var prev = tree.upperBound(item - 0.1);
         assert.equal(prev.data(), inserts[i]);
 
         var next = tree.upperBound(item + 0.1);
-        assert.equal(next.data(), inserts[i+1]);
+        assert.equal(next.data(), inserts[i + 1]);
     }
 
     // test edges
@@ -201,7 +213,7 @@ function find(assert, tree_class) {
     var inserts = loader.get_inserts(loader.load(SAMPLE_FILE));
     var tree = loader.build_tree(tree_class, inserts);
 
-    for(var i=1; i<inserts.length-1; ++i) {
+    for (var i = 1; i < inserts.length - 1; ++i) {
         var item = inserts[i];
 
         assert.equal(tree.find(item), item);
@@ -213,16 +225,18 @@ function find_iter(assert, tree_class) {
     var inserts = loader.get_inserts(loader.load(SAMPLE_FILE));
     var tree = loader.build_tree(tree_class, inserts);
 
-    inserts.sort(function(a,b) { return a - b; });
+    inserts.sort(function(a, b) {
+        return a - b;
+    });
 
-    for(var i=1; i<inserts.length-1; ++i) {
+    for (var i = 1; i < inserts.length - 1; ++i) {
         var item = inserts[i];
 
         var iter = tree.findIter(item);
         assert.equal(iter.data(), item);
-        assert.equal(iter.prev(), inserts[i-1]);
+        assert.equal(iter.prev(), inserts[i - 1]);
         iter.next();
-        assert.equal(iter.next(), inserts[i+1]);
+        assert.equal(iter.next(), inserts[i + 1]);
 
         assert.equal(tree.findIter(item + 0.1), null);
     }
@@ -247,7 +261,7 @@ var TESTS = {
 var test_funcs = {};
 TREES.forEach(function(tree) {
     var tree_class = require('../lib/' + tree);
-    for(var test in TESTS) {
+    for (var test in TESTS) {
         (function(test) {
             test_funcs[tree + "_" + test] = function(assert) {
                 TESTS[test](assert, tree_class);
