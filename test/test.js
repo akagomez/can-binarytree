@@ -32,11 +32,9 @@ test('Return index on insert (without rebalance)', 3, function () {
         return _doubleRotate.apply(tree, arguments);
     };
 
-    var items = ['B','A','C'];
-
-    equal(tree.insert(items[0]), 0, 'Insert index reported correctly');
-    equal(tree.insert(items[1]), 0, 'Insert index reported correctly');
-    equal(tree.insert(items[2]), 2, 'Insert index reported correctly');
+    deepEqual(tree.insert('B'), 0, 'Insert index reported correctly');
+    deepEqual(tree.insert('A'), 0, 'Insert index reported correctly');
+    deepEqual(tree.insert('C'), 2, 'Insert index reported correctly');
 });
 
 test('Return index on insert (with rebalance, singleRotate only)', 5, function () {
@@ -71,12 +69,10 @@ test('Return index on insert (with rebalance, singleRotate only)', 5, function (
         return _doubleRotate.apply(tree, arguments);
     };
 
-    var items = ['A','B','C'];
-
-    equal(tree.insert(items[0]), 0, 'Returned correct insert index');
-    equal(tree.insert(items[1]), 1, 'Returned correct insert index');
-    equal(tree.insert(items[2]), 2, 'Returned correct insert index');
-    equal(tree.insert(items[0]), -1, 'Returned "not inserted" value');
+    deepEqual(tree.insert('A'), 0, 'Returned correct insert index');
+    deepEqual(tree.insert('B'), 1, 'Returned correct insert index');
+    deepEqual(tree.insert('C'), 2, 'Returned correct insert index');
+    deepEqual(tree.insert('A'), -1, 'Returned "not inserted" value');
 });
 
 test('Return index on insert (with rebalance, single and doubleRotate)', 6, function () {
@@ -115,12 +111,10 @@ test('Return index on insert (with rebalance, single and doubleRotate)', 6, func
         return result;
     };
 
-    var items = ['A','C','B'];
-
-    equal(tree.insert(items[0]), 0, 'Returned correct insert index');
-    equal(tree.insert(items[1]), 1, 'Returned correct insert index');
-    equal(tree.insert(items[2]), 1, 'Returned correct insert index');
-    equal(tree.insert(items[0]), -1, 'Returned "not inserted" value');
+    deepEqual(tree.insert('A'), 0, 'Returned correct insert index');
+    deepEqual(tree.insert('C'), 1, 'Returned correct insert index');
+    deepEqual(tree.insert('B'), 1, 'Returned correct insert index');
+    deepEqual(tree.insert('A'), -1, 'Returned "not inserted" value');
 });
 
 test('Return index on remove', function () {
@@ -132,16 +126,22 @@ test('Return index on remove', function () {
 
     var tree = new RBTree(comparator);
 
-    var items = ['A','B','C'];
+    tree.insert('A');
+    tree.insert('B');
+    tree.insert('C');
+    tree.insert('D');
+    tree.insert('E');
+    tree.insert('F');
 
-    tree.insert(items[0]);
-    tree.insert(items[1]);
-    tree.insert(items[2]);
 
-    equal(tree.remove(items[1]), 1, 'Returned correct remove index');
-    equal(tree.remove(items[0]), 0, 'Returned correct remove index');
-    equal(tree.remove(items[2]), 0, 'Returned correct remove index');
-    equal(tree.remove(items[0]), -1, 'Returned "not found" value');
+
+    deepEqual(tree.remove('F'), 5, 'Returned correct remove index');
+    deepEqual(tree.remove('A'), 0, 'Returned correct remove index');
+    deepEqual(tree.remove('D'), 2, 'Returned correct remove index');
+    deepEqual(tree.remove('E'), 2, 'Returned correct remove index');
+    deepEqual(tree.remove('B'), 0, 'Returned correct remove index');
+    deepEqual(tree.remove('C'), 0, 'Returned correct remove index');
+    deepEqual(tree.remove('404'), -1, 'Returned "not found" value');
 });
 
 test('Get index of item', function () {
@@ -157,20 +157,148 @@ test('Get index of item', function () {
     tree.insert('B');
     tree.insert('C');
 
-    equal(tree.findIndex('A'), 0, 'Returned correct index');
-    equal(tree.findIndex('B'), 1, 'Returned correct index');
-    equal(tree.findIndex('C'), 2, 'Returned correct index');
-    equal(tree.findIndex('404'), -1, 'Returned "not found" value');
+    deepEqual(tree.getIndex('A'), 0, 'Returned correct index');
+    deepEqual(tree.getIndex('B'), 1, 'Returned correct index');
+    deepEqual(tree.getIndex('C'), 2, 'Returned correct index');
+    deepEqual(tree.getIndex('404'), -1, 'Returned "not found" value');
 
     tree.insert('D');
-    equal(tree.findIndex('D'), 3, 'Returned correct index');
+    deepEqual(tree.getIndex('D'), 3, 'Returned correct index');
 
     tree.insert('G');
-    equal(tree.findIndex('G'), 4, 'Returned correct index');
+    deepEqual(tree.getIndex('G'), 4, 'Returned correct index');
 
     tree.insert('F');
-    equal(tree.findIndex('F'), 4, 'Returned correct index');
+    deepEqual(tree.getIndex('F'), 4, 'Returned correct index');
 
-    tree.insert('G')
-    equal(tree.index('G'), 5, 'Returned correct index');
+    tree.insert('G');
+    deepEqual(tree.getIndex('G'), 5, 'Returned correct index');
+});
+
+test('Iterate from specified item', function () {
+    var comparator = function (a, b) {
+        a = a.charCodeAt(0);
+        b = b.charCodeAt(0);
+        return a === b ? 0 : a < b ? -1 : 1; // ASC
+    };
+
+    var tree = new RBTree(comparator);
+
+    tree.insert('A');
+    tree.insert('B');
+    tree.insert('C');
+
+    var iter = tree.findIter('B');
+
+    deepEqual(iter.data(), 'B', 'Iterator points to correct starting node');
+
+    iter.next();
+
+    deepEqual(iter.data(), 'C', 'Iterator points to correct node');
+
+    iter.next();
+
+    deepEqual(iter.data(), null, 'Iterator points to null');
+
+    iter.next();
+
+    deepEqual(iter.data(), 'A', 'Iterator points to correct node');
+});
+
+/*test('Duplicate items are placed left', function () {
+
+    var comparator = function (a, b) {
+        a = a.charCodeAt(0);
+        b = b.charCodeAt(0);
+        return a === b ? 0 : a < b ? -1 : 1; // ASC
+    };
+
+    var tree = new RBTree(comparator);
+
+    tree.insert('A');
+    tree.insert('B');
+    tree.insert('B');
+    tree.insert('C');
+
+    deepEqual(tree.size, 4, 'Duplicate item added')
+    deepEqual(tree.getIndex('A'), 0, 'Correct index returned');
+    deepEqual(tree.getIndex('B'), 2, 'Correct index returned');
+    deepEqual(tree.getIndex('C'), 3, 'Correct index returned');
+});*/
+
+test('leftCount is maintained on insert and remove', function () {
+    var comparator = function (a, b) {
+        a = a.charCodeAt(0);
+        b = b.charCodeAt(0);
+        return a === b ? 0 : a < b ? -1 : 1; // ASC
+    };
+
+    var recursiveChildCountTest = function (node, isChild) {
+        var match = true;
+        var count = 0;
+        var storedCount;
+
+        if (node) {
+
+            storedCount = node.leftCount + node.rightCount;
+
+            if (node.left !== null) {
+                count++;
+                count += recursiveChildCountTest(node.left, true);
+            }
+
+            if (node.right !== null) {
+                count++;
+                count += recursiveChildCountTest(node.right, true);
+            }
+
+            if (storedCount !== count) {
+                match = false;
+            }
+
+            deepEqual(count, storedCount, 'Count from "' + node.data + '"');
+        }
+
+        return (isChild ? count : match);
+    };
+
+    var centerOutRemove = function (start) {
+        var i = 0;
+        var offset = 0;
+        var letter, index, match;
+
+        while (i < alphabet.length) {
+
+            index = start + offset;
+            letter = alphabet.slice(index, index + 1);
+
+            if (letter.length) {
+                letter = letter.shift();
+                tree.remove(letter);
+                match = recursiveChildCountTest(tree._root);
+                ok(match, 'Child count is correct after removing "' + letter + '"');
+                i++;
+            }
+
+            offset = -(offset);
+
+            if (offset >= 0) {
+                offset++;
+            }
+        }
+    };
+
+    var tree = new RBTree(comparator);
+    var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    // var alphabet = "ABCDEF".split("");
+    var match;
+
+    alphabet.forEach(function (letter) {
+        tree.insert(letter);
+        match = recursiveChildCountTest(tree._root);
+        ok(match, 'Child count is correct after adding "' + letter + '"');
+    });
+
+    centerOutRemove(alphabet.length/2);
+
 });
