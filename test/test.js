@@ -1,5 +1,5 @@
 var QUnit = require("steal-qunit");
-var RBTree = require('can-redblacktree').RBTree;
+var RBTree = require('can-redblacktree');
 
 QUnit.module('can-redblacktree', {
     setup: function () {}

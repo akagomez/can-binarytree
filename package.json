@@ -22,7 +22,9 @@
   "scripts": {
     "test": "testee test/index.html && nodeunit ./test/test_*.js && jshint lib/*.js index.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "can": "2.2.X"
+  },
   "devDependencies": {
     "jshint": "0.5.9",
     "nodeunit": "0.7.4",
