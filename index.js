@@ -20,17 +20,18 @@ RBTree.prototype.insert = function (data) {
 var _remove = RBTree.prototype.remove;
 RBTree.prototype.remove = function (data) {
 
-    // Get the node data
-    data = this.find(data);
+    // Get the node data before its removed from the tree
+    var nodeData = this.find(data);
 
     // Remove, and get the index
     var removeIndex = _remove.apply(this, arguments);
 
     if (removeIndex >= 0) {
-        this.dispatch('remove', [[data], removeIndex]);
+        this.dispatch('remove', [[nodeData], removeIndex]);
     }
 
     return removeIndex;
+
 };
 
 module.exports = RBTree;

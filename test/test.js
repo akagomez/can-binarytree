@@ -11,122 +11,35 @@ var comparator = function (a, b) {
     return a === b ? 0 : a < b ? -1 : 1; // ASC
 };
 
-test('Return index on insert (without rebalance)', 3, function () {
+test('Return index on insert', function () {
 
     var tree = new RBTree(comparator);
+    var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-    var _singleRotate = tree.singleRotate;
-    tree.singleRotate = function () {
+    alphabet.forEach(function (letter, index) {
+        var value = tree.insert(letter);
+        deepEqual(value, index, 'Returned index of insert');
+    });
 
-        ok(false, 'Tree should not rebalance');
-
-        // Prevent errors
-        return _singleRotate.apply(tree, arguments);
-    };
-
-    var _doubleRotate = tree.doubleRotate;
-    tree.doubleRotate = function () {
-
-        ok(false, 'Tree should not be doubleRotated');
-
-        // Prevent errors
-        return _doubleRotate.apply(tree, arguments);
-    };
-
-    deepEqual(tree.insert('B'), 0, 'Insert index reported correctly');
-    deepEqual(tree.insert('A'), 0, 'Insert index reported correctly');
-    deepEqual(tree.insert('C'), 2, 'Insert index reported correctly');
-});
-
-test('Return index on insert (with rebalance, singleRotate only)', 5, function () {
-
-    var tree = new RBTree(comparator);
-
-    var _singleRotate = tree.singleRotate;
-    tree.singleRotate = function () {
-
-        ok(true, 'Tree should rebalance');
-
-        var result = _singleRotate.apply(tree, arguments);
-
-        // Put things back the way they were
-        tree.singleRotate = _singleRotate;
-
-        return result;
-    };
-
-
-    var _doubleRotate = tree.doubleRotate;
-    tree.doubleRotate = function () {
-
-        ok(false, 'Tree should not be double rotated');
-
-        // Prevent errors
-        return _doubleRotate.apply(tree, arguments);
-    };
-
-    deepEqual(tree.insert('A'), 0, 'Returned correct insert index');
-    deepEqual(tree.insert('B'), 1, 'Returned correct insert index');
-    deepEqual(tree.insert('C'), 2, 'Returned correct insert index');
-    deepEqual(tree.insert('A'), -1, 'Returned "not inserted" value');
-});
-
-test('Return index on insert (with rebalance, single and doubleRotate)', 6, function () {
-
-    var tree = new RBTree(comparator);
-
-    var _singleRotate = tree.singleRotate;
-    tree.singleRotate = function () {
-
-        ok(true, 'Tree should rebalance with singleRotate');
-
-        var result = _singleRotate.apply(tree, arguments);
-
-        // Put things back the way they were
-        tree.singleRotate = _singleRotate;
-
-        return result;
-    };
-
-
-    var _doubleRotate = tree.doubleRotate;
-    tree.doubleRotate = function () {
-
-        ok(true, 'Tree should rebalance with doubleRotate');
-
-        var result = _doubleRotate.apply(tree, arguments);
-
-        // Put things back the way they were
-        tree.doubleRotate = _doubleRotate;
-
-        return result;
-    };
-
-    deepEqual(tree.insert('A'), 0, 'Returned correct insert index');
-    deepEqual(tree.insert('C'), 1, 'Returned correct insert index');
-    deepEqual(tree.insert('B'), 1, 'Returned correct insert index');
-    deepEqual(tree.insert('A'), -1, 'Returned "not inserted" value');
+    deepEqual(tree.remove('404'), -1, 'Returned "not found" value');
 });
 
 test('Return index on remove', function () {
 
     var tree = new RBTree(comparator);
+    var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-    tree.insert('A');
-    tree.insert('B');
-    tree.insert('C');
-    tree.insert('D');
-    tree.insert('E');
-    tree.insert('F');
+    alphabet.forEach(function (letter) {
+        tree.insert(letter);
+    });
 
+    // Remove in reverse so that both left and right traversals
+    // are tested
+    for (var i = alphabet.length - 1; i >= 0; i--) {
+        var value = tree.remove(alphabet[i]);
+        deepEqual(value, i, 'Returned index of remove');
+    }
 
-
-    deepEqual(tree.remove('F'), 5, 'Returned correct remove index');
-    deepEqual(tree.remove('A'), 0, 'Returned correct remove index');
-    deepEqual(tree.remove('D'), 2, 'Returned correct remove index');
-    deepEqual(tree.remove('E'), 2, 'Returned correct remove index');
-    deepEqual(tree.remove('B'), 0, 'Returned correct remove index');
-    deepEqual(tree.remove('C'), 0, 'Returned correct remove index');
     deepEqual(tree.remove('404'), -1, 'Returned "not found" value');
 });
 
@@ -143,6 +56,8 @@ test('Get index of item', function () {
         var value = tree.indexOf(letter);
         deepEqual(value, index, 'Found index of value');
     });
+
+    deepEqual(tree.indexOf('404'), -1, 'Returned "not found" value');
 });
 
 test('Get item by index', function () {
@@ -158,6 +73,8 @@ test('Get item by index', function () {
         var value = tree.getByIndex(index);
         deepEqual(value, letter, 'Found value by index');
     });
+
+    deepEqual(tree.getByIndex(100), null, 'Returned "not found" value');
 });
 
 test('leftCount is maintained on insert and remove', function () {
