@@ -5,12 +5,13 @@ QUnit.module('can-redblacktree', {
     setup: function () {}
 });
 
+var comparator = function (a, b) {
+    a = a.charCodeAt(0);
+    b = b.charCodeAt(0);
+    return a === b ? 0 : a < b ? -1 : 1; // ASC
+};
+
 test('Return index on insert (without rebalance)', 3, function () {
-    var comparator = function (a, b) {
-        a = a.charCodeAt(0);
-        b = b.charCodeAt(0);
-        return a === b ? 0 : a < b ? -1 : 1; // ASC
-    };
 
     var tree = new RBTree(comparator);
 
@@ -38,11 +39,6 @@ test('Return index on insert (without rebalance)', 3, function () {
 });
 
 test('Return index on insert (with rebalance, singleRotate only)', 5, function () {
-    var comparator = function (a, b) {
-        a = a.charCodeAt(0);
-        b = b.charCodeAt(0);
-        return a === b ? 0 : a < b ? -1 : 1; // ASC
-    };
 
     var tree = new RBTree(comparator);
 
@@ -76,11 +72,6 @@ test('Return index on insert (with rebalance, singleRotate only)', 5, function (
 });
 
 test('Return index on insert (with rebalance, single and doubleRotate)', 6, function () {
-    var comparator = function (a, b) {
-        a = a.charCodeAt(0);
-        b = b.charCodeAt(0);
-        return a === b ? 0 : a < b ? -1 : 1; // ASC
-    };
 
     var tree = new RBTree(comparator);
 
@@ -118,11 +109,6 @@ test('Return index on insert (with rebalance, single and doubleRotate)', 6, func
 });
 
 test('Return index on remove', function () {
-    var comparator = function (a, b) {
-        a = a.charCodeAt(0);
-        b = b.charCodeAt(0);
-        return a === b ? 0 : a < b ? -1 : 1; // ASC
-    };
 
     var tree = new RBTree(comparator);
 
@@ -145,11 +131,6 @@ test('Return index on remove', function () {
 });
 
 test('Get index of item', function () {
-    var comparator = function (a, b) {
-        a = a.charCodeAt(0);
-        b = b.charCodeAt(0);
-        return a === b ? 0 : a < b ? -1 : 1; // ASC
-    };
 
     var tree = new RBTree(comparator);
 
@@ -175,63 +156,26 @@ test('Get index of item', function () {
     deepEqual(tree.getIndex('G'), 5, 'Returned correct index');
 });
 
-test('Iterate from specified item', function () {
-    var comparator = function (a, b) {
-        a = a.charCodeAt(0);
-        b = b.charCodeAt(0);
-        return a === b ? 0 : a < b ? -1 : 1; // ASC
-    };
+test('Get item by index', function () {
 
     var tree = new RBTree(comparator);
+    var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-    tree.insert('A');
-    tree.insert('B');
-    tree.insert('C');
+    alphabet.forEach(function (letter) {
+        tree.insert(letter);
+    });
 
-    var iter = tree.findIter('B');
+    console.log(tree.print(function (node) {
+        return node.data + ':' + node.leftCount + '|' + node.rightCount;
+    }));
 
-    deepEqual(iter.data(), 'B', 'Iterator points to correct starting node');
-
-    iter.next();
-
-    deepEqual(iter.data(), 'C', 'Iterator points to correct node');
-
-    iter.next();
-
-    deepEqual(iter.data(), null, 'Iterator points to null');
-
-    iter.next();
-
-    deepEqual(iter.data(), 'A', 'Iterator points to correct node');
+    alphabet.forEach(function (letter, index) {
+        var value = tree.getByIndex(index);
+        deepEqual(value, letter, 'Found value by index');
+    });
 });
 
-/*test('Duplicate items are placed left', function () {
-
-    var comparator = function (a, b) {
-        a = a.charCodeAt(0);
-        b = b.charCodeAt(0);
-        return a === b ? 0 : a < b ? -1 : 1; // ASC
-    };
-
-    var tree = new RBTree(comparator);
-
-    tree.insert('A');
-    tree.insert('B');
-    tree.insert('B');
-    tree.insert('C');
-
-    deepEqual(tree.size, 4, 'Duplicate item added')
-    deepEqual(tree.getIndex('A'), 0, 'Correct index returned');
-    deepEqual(tree.getIndex('B'), 2, 'Correct index returned');
-    deepEqual(tree.getIndex('C'), 3, 'Correct index returned');
-});*/
-
 test('leftCount is maintained on insert and remove', function () {
-    var comparator = function (a, b) {
-        a = a.charCodeAt(0);
-        b = b.charCodeAt(0);
-        return a === b ? 0 : a < b ? -1 : 1; // ASC
-    };
 
     var recursiveChildCountTest = function (node, isChild) {
         var match = true;
