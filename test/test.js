@@ -133,27 +133,16 @@ test('Return index on remove', function () {
 test('Get index of item', function () {
 
     var tree = new RBTree(comparator);
+    var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-    tree.insert('A');
-    tree.insert('B');
-    tree.insert('C');
+    alphabet.forEach(function (letter) {
+        tree.insert(letter);
+    });
 
-    deepEqual(tree.getIndex('A'), 0, 'Returned correct index');
-    deepEqual(tree.getIndex('B'), 1, 'Returned correct index');
-    deepEqual(tree.getIndex('C'), 2, 'Returned correct index');
-    deepEqual(tree.getIndex('404'), -1, 'Returned "not found" value');
-
-    tree.insert('D');
-    deepEqual(tree.getIndex('D'), 3, 'Returned correct index');
-
-    tree.insert('G');
-    deepEqual(tree.getIndex('G'), 4, 'Returned correct index');
-
-    tree.insert('F');
-    deepEqual(tree.getIndex('F'), 4, 'Returned correct index');
-
-    tree.insert('G');
-    deepEqual(tree.getIndex('G'), 5, 'Returned correct index');
+    alphabet.forEach(function (letter, index) {
+        var value = tree.indexOf(letter);
+        deepEqual(value, index, 'Found index of value');
+    });
 });
 
 test('Get item by index', function () {
