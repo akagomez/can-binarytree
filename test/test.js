@@ -165,10 +165,6 @@ test('Get item by index', function () {
         tree.insert(letter);
     });
 
-    console.log(tree.print(function (node) {
-        return node.data + ':' + node.leftCount + '|' + node.rightCount;
-    }));
-
     alphabet.forEach(function (letter, index) {
         var value = tree.getByIndex(index);
         deepEqual(value, letter, 'Found value by index');
