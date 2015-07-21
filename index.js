@@ -1,12 +1,22 @@
 var can = require('can/util/util');
+var Map = require('can/map/map');
 var Construct = require('can/construct/construct');
 var TreeLib = require('./lib/rbtree');
 
-// Save to "can" namespace
-can.RedBlackTree = can.Construct.extend(TreeLib.prototype).extend({
+// Copy
+var treeLibProto = can.simpleExtend({}, TreeLib.prototype);
 
-    // Call the original constructor
-    init: TreeLib,
+// Save to "can" namespace
+can.RedBlackTree = can.Construct.extend(can.simpleExtend(treeLibProto, {
+
+    init: function () {
+
+        // Call the original constructor
+        TreeLib.apply(this, arguments);
+    },
+
+    // Save a reference to the TreeLib prototype methods
+    _parent: TreeLib.prototype,
 
     // Trigger a "add" event on successful insert
     insert: function (data) {
@@ -42,6 +52,10 @@ can.RedBlackTree = can.Construct.extend(TreeLib.prototype).extend({
             var items = [];
 
             this.each(function (item) {
+                if (item instanceof can.Map) {
+                    item = item.attr();
+                }
+
                 items.push(item);
             });
 
@@ -75,7 +89,7 @@ can.RedBlackTree = can.Construct.extend(TreeLib.prototype).extend({
         });
     }
 
-});
+}));
 
 // Add event utilities
 can.extend(can.RedBlackTree.prototype, can.event);
