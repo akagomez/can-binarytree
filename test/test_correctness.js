@@ -68,7 +68,7 @@ var assert_func = {
 function tree_assert(tree_name) {
     return function(tree) {
         return assert_func[tree_name](tree._root, tree._comparator) !== 0;
-    }
+    };
 }
 
 function run_test(assert, tree_assert, tree_class, test_path) {
