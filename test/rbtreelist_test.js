@@ -35,7 +35,7 @@ test('Set value by index (natural order)', function () {
 
         ok(match, 'Order is correct after set of "' + letter + '"');
     });
-    printTree(tree)
+    printTree(tree);
 });
 
 test('Set value by index (reverse order)', function () {
@@ -219,6 +219,17 @@ test('Insert and remove simultaneously with .splice()', function () {
     var node = tree.get(replaceIndex);
 
     deepEqual(node.data, doubledValue, 'Inserted value matches');
+});
+
+test('Get index of each node', function () {
+    var tree = new RBTreeList();
+
+    // Fill the tree with values
+    tree.splice.apply(tree, [0, 0].concat(alphabet));
+
+    tree.each(function (node, i) {
+        deepEqual(tree.indexOf(node), i, 'Index is correct');
+    });
 });
 
 test('"Holey" indexes are not enumerable', function () {

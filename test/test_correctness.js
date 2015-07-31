@@ -4,7 +4,7 @@ var assert = require('assert');
 var loader = require('./loader');
 
 var BASE_DIR = __dirname + '/samples';
-var TREES = ['rbtree', 'bintree'];
+var TREES = ['rbtree', 'bintree', 'rbtreelist'];
 
 function bt_assert(root, comparator) {
     if (root === null) {
