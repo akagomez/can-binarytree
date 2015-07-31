@@ -35,7 +35,6 @@ test('Set value by index (natural order)', function () {
 
         ok(match, 'Order is correct after set of "' + letter + '"');
     });
-    printTree(tree);
 });
 
 test('Set value by index (reverse order)', function () {
