@@ -4,7 +4,7 @@ var assert = require('assert');
 var loader = require('./loader');
 
 var BASE_DIR = __dirname + '/samples';
-var TREES = ['rbtree', 'bintree', 'rbtreelist'];
+var TREES = [/*'rbtree', 'bintree', */'rbtreelist'];
 
 function bt_assert(root, comparator) {
     if (root === null) {
@@ -28,6 +28,7 @@ function is_red(node) {
 }
 
 function rb_assert(root, comparator) {
+
     if (root === null) {
         return 1;
     } else {
@@ -62,7 +63,8 @@ function rb_assert(root, comparator) {
 
 var assert_func = {
     rbtree: rb_assert,
-    bintree: bt_assert
+    bintree: bt_assert,
+    rbtreelist: rb_assert
 };
 
 function tree_assert(tree_name) {
@@ -71,27 +73,41 @@ function tree_assert(tree_name) {
     };
 }
 
-function run_test(assert, tree_assert, tree_class, test_path) {
+function run_test(assert, tree_assert, tree_class, test_path, tree_name) {
     var tree = loader.new_tree(tree_class);
 
     var tests = loader.load(test_path);
 
     var elems = 0;
     tests.forEach(function(n) {
+        console.log('Start', n);
         if (n > 0) {
             // insert
-            assert.notEqual(tree.insert(n), -1);
-            assert.equal(tree.find(n), n);
-            elems++;
+            if (tree_name === 'rbtreelist') {
+                assert.equal(tree.set(n, n).data, n);
+                assert.equal(tree.get(n).data, n);
+                elems = Math.max(elems, n+1);
+            } else {
+                assert.notEqual(tree.insert(n), -1);
+                assert.equal(tree.find(n), n);
+                elems++;
+            }
         } else {
             // remove
             n = -n;
-            assert.notEqual(tree.remove(n), -1);
-            assert.equal(tree.find(n), null);
+            if (tree_name === 'rbtreelist') {
+                var node = tree.get(n);
+                assert.deepEqual(tree.remove(n), node);
+                assert.equal(tree.get(n), null);
+            } else {
+                assert.notEqual(tree.remove(n), -1);
+                assert.equal(tree.find(n), null);
+            }
             elems--;
         }
         assert.equal(tree.size, elems);
         assert.ok(tree_assert(tree));
+        console.log('Finish', n);
     });
 }
 
@@ -104,7 +120,7 @@ TREES.forEach(function(tree) {
     tests.forEach(function(test) {
         var test_path = BASE_DIR + "/" + test;
         test_funcs[tree + "_" + test] = function(assert) {
-            run_test(assert, tree_assert(tree), tree_class, test_path);
+            run_test(assert, tree_assert(tree), tree_class, test_path, tree);
             assert.done();
         };
     });

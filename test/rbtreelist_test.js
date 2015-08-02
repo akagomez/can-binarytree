@@ -1,5 +1,5 @@
 var QUnit = require("steal-qunit");
-var RBTreeList = require('../lib/rbtreelist');
+var RBTreeList = window.RBTreeList = require('../lib/rbtreelist');
 
 QUnit.module('can-rbtree-list', {
     setup: function () {}
@@ -8,10 +8,16 @@ QUnit.module('can-rbtree-list', {
 var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 // var alphabet = "ABCDEF".split("");
 
-window.printTree = function (tree) {
+window.printTree = function (tree, debug) {
     console.log(tree.print(function (node) {
-        return (node.data === undefined ? '_' : node.data) + ':^' +
-            node.parent.data + '|' + node.leftCount + '|' + node.rightCount;
+        var index = tree.indexOfNode(node);
+        var value = (node.data === undefined ? '_' : node.data);
+        var out =  index;
+        if (debug !== false) {
+            out += '(' +node.leftCount + '|' + node.leftGapCount + '|' + node.rightCount + ')';
+        }
+        out += ':' + value;
+        return out;
     }));
 };
 
@@ -22,6 +28,7 @@ test('Set value by index (natural order)', function () {
         var match = true;
 
         tree.set(i, letter);
+        printTree(tree)
 
         for (var j = 0; j <= i; j++) {
             var l = tree.get(j).data;
@@ -64,13 +71,55 @@ test('Set value by index (reverse order)', function () {
 test('Set value by index (with gaps between indexes)', function () {
     var tree = new RBTreeList();
 
-    tree.set(26, 'Z');
-    tree.set(0, 'A');
-    tree.set(7, 'G');
+    tree.set(20, alphabet[20]);
+    deepEqual(tree.get(20).data, alphabet[20]);
 
-    deepEqual(tree.get(26).data, 'Z');
-    deepEqual(tree.get(0).data, 'A');
-    deepEqual(tree.get(7).data, 'G');
+    tree.set(5, alphabet[5]);
+    deepEqual(tree.get(5).data, alphabet[5]);
+
+    tree.set(15, alphabet[15]);
+    deepEqual(tree.get(15).data, alphabet[15]);
+
+    tree.set(10, alphabet[10]);
+    deepEqual(tree.get(10).data, alphabet[10]);
+
+    tree.set(12, alphabet[12]);
+    deepEqual(tree.get(12).data, alphabet[12]);
+
+    tree.set(11, alphabet[11]);
+    deepEqual(tree.get(11).data, alphabet[11]);
+});
+
+test('Gaps are calculated correctly', function () {
+    var tree = new RBTreeList();
+    var node;
+
+    node = tree.set(5, alphabet[5]);
+    equal(node.leftGapCount, 5);
+    node = tree.set(10, alphabet[10]);
+    equal(node.leftGapCount, 4);
+    node = tree.set(15, alphabet[15]);
+    equal(node.leftGapCount, 4);
+    node = tree.set(20, alphabet[20]);
+    equal(node.leftGapCount, 4);
+});
+
+test('Setting the value of gappped index doesn\'t effect subsequent indices' , function () {
+    var tree = new RBTreeList();
+
+    var node1 = tree.set(25, alphabet[25]);
+    printTree(tree);
+    var node2 = tree.set(20, alphabet[20]);
+    printTree(tree);
+    var node3 = tree.set(15, alphabet[15]);
+    printTree(tree);
+    var node4 = tree.set(10, alphabet[10]);
+    printTree(tree);
+
+    equal(tree.indexOfNode(node1), 25);
+    equal(tree.indexOfNode(node2), 20);
+    equal(tree.indexOfNode(node3), 15);
+    equal(tree.indexOfNode(node4), 10);
 });
 
 test('Set single value via .splice()', function () {
@@ -122,6 +171,26 @@ test('Insert a value between two existing values via .splice()', function () {
     deepEqual(tree.get(middleIndex).data, splicedValue);
     deepEqual(tree.get(middleIndex + 1).data, alphabet[middleIndex]);
 });
+
+test('Remove an item via .remove()', function () {
+
+});
+
+test('Removing a gapped item yields correct length', function () {
+    var tree = new RBTreeList();
+    var modelList = [];
+
+    modelList[100] = 'abc';
+    tree.set(100, 'abc');
+
+    equal(tree.size, modelList.length, 'Length is correct after insert');
+
+    modelList.splice(100, 1);
+    tree.remove(100);
+
+    equal(tree.size, modelList.length, 'Length is correct after remove');
+});
+
 
 test('Remove a single value via .splice()', function () {
     var tree = new RBTreeList();
@@ -227,7 +296,7 @@ test('Get index of each node', function () {
     tree.splice.apply(tree, [0, 0].concat(alphabet));
 
     tree.each(function (node, i) {
-        deepEqual(tree.indexOf(node), i, 'Index is correct');
+        deepEqual(tree.indexOfNode(node), i, 'Index is correct');
     });
 });
 
@@ -335,3 +404,52 @@ test('leftCount is maintained on add and remove', function () {
     centerOutRemove(alphabet.length/2);
 
 });
+
+test('10k', function () {
+    var url = 'samples/10k';
+    var req = new XMLHttpRequest();
+
+    QUnit.stop();
+
+    req.addEventListener('load', function () {
+        QUnit.start();
+
+        var operations = this.responseText.split('\n');
+        var modelList = [];
+
+        var tree = new RBTreeList();
+        operations.forEach(function (operation, i) {
+            operation = Math.round(operation / 100000);
+            var index = Math.abs(operation);
+            var node;
+
+            console.log('Operation:', operation);
+
+            if (operation > 0) {
+                modelList[index] = i;
+
+                node = tree.set(index, i);
+                ok(node instanceof RBTreeList.prototype.Node, 'Set returned a Node');
+                equal(node.data, i, 'Returned node has correct data');
+
+                node = tree.get(index);
+                ok(node instanceof RBTreeList.prototype.Node, 'Get returned a Node');
+                equal(node.data, i, 'Returned node has correct data');
+            } else {
+                modelList.splice(index, 1);
+                // node = tree.get(index);
+                // equal(tree.remove(index), node, '.remove() returned the same node');
+                tree.remove(index)
+                ok(false, 'Cannot get reference to correct node on .remove()');
+            }
+
+            equal(tree.size, modelList.length, 'Length is correct');
+
+            printTree(tree, true);
+        });
+    });
+
+    req.open("get", url, true);
+    req.send();
+});
+
