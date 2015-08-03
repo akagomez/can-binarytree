@@ -21,6 +21,18 @@ window.printTree = function (tree, debug) {
     }));
 };
 
+window.printLinks = function (tree) {
+    var out = '';
+    tree.each(function (node, index) {
+        var left = (node.prev && node.prev.data);
+        var right = (node.next && node.next.data);
+        left = left ? left : '_';
+        right = right ? right : '_';
+        out +=  left + ' < ' + node.data + ' > ' + right + '\n';
+    });
+    console.log(out);
+}
+
 test('Set value by index (natural order)', function () {
     var tree = new RBTreeList();
 
@@ -287,6 +299,28 @@ test('Insert and remove simultaneously with .splice()', function () {
     var node = tree.get(replaceIndex);
 
     deepEqual(node.data, doubledValue, 'Inserted value matches');
+});
+
+test('Nodes are linked', function () {
+    var tree = window.tree = new RBTreeList();
+    var firstNode, node;
+
+    alphabet.forEach(function (letter, i) {
+        node = tree.set(i, letter);
+
+        if (! firstNode) {
+            firstNode = node;
+        }
+
+        node = firstNode;
+        i = 0;
+
+        while (node) {
+            equal(node.data, alphabet[i]);
+            node = node.next;
+            i++;
+        }
+    });
 });
 
 test('Get index of each node', function () {
