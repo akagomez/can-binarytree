@@ -462,13 +462,13 @@ test('10k', function () {
             if (operation > 0) {
                 modelList[index] = i;
 
-                node = tree.set(index, i);
+                node = tree.set(index, index);
                 ok(node instanceof RBTreeList.prototype.Node, 'Set returned a Node');
-                equal(node.data, i, 'Returned node has correct data');
+                equal(node.data, index, 'Returned node has correct data');
 
                 node = tree.get(index);
                 ok(node instanceof RBTreeList.prototype.Node, 'Get returned a Node');
-                equal(node.data, i, 'Returned node has correct data');
+                equal(node.data, index, 'Returned node has correct data');
             } else {
                 modelList.splice(index, 1);
                 // node = tree.get(index);
@@ -479,7 +479,7 @@ test('10k', function () {
 
             equal(tree.size, modelList.length, 'Length is correct');
 
-            printTree(tree, true);
+            printTree(tree, false);
         });
     });
 
