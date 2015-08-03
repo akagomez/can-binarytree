@@ -301,23 +301,34 @@ test('Insert and remove simultaneously with .splice()', function () {
     deepEqual(node.data, doubledValue, 'Inserted value matches');
 });
 
-test('Nodes are linked', function () {
+test('Nodes are linked (parent, prev, next)', function () {
     var tree = window.tree = new RBTreeList();
-    var firstNode, node;
+    var cursor, node, parent;
 
     alphabet.forEach(function (letter, i) {
+
         node = tree.set(i, letter);
 
-        if (! firstNode) {
-            firstNode = node;
-        }
+        equal(node.data, letter, '"' + letter + '" set');
 
-        node = firstNode;
+        cursor = tree.first();
         i = 0;
 
-        while (node) {
-            equal(node.data, alphabet[i]);
-            node = node.next;
+        while (cursor) {
+
+            equal(cursor.data, alphabet[i], 'Next node matches model');
+
+            parent = cursor;
+
+            // Crawl parents
+            while (parent.parent) {
+                parent = parent.parent;
+            }
+
+            equal(parent.data, tree._root.data, 'Reached root via linked parent');
+
+            // Iterate nodes via link
+            cursor = cursor.next;
             i++;
         }
     });
@@ -424,9 +435,7 @@ test('leftCount is maintained on add and remove', function () {
         }
     };
 
-    var tree = new RBTreeList();
-    // var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-    var alphabet = "ABCDEF".split("");
+    var tree = window.tree = new RBTreeList();
     var match;
 
     alphabet.forEach(function (letter, i) {
