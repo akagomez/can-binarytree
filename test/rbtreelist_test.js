@@ -8,7 +8,7 @@ QUnit.module('can-rbtree-list', {
 var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 // var alphabet = "ABCDEF".split("");
 
-window.printTree = function (tree, debug) {
+window.printTree = function (tree, debug, start, count) {
     console.log(tree.print(function (node) {
         var index = tree.indexOfNode(node);
         var value = (node.data === undefined ? '_' : node.data);
@@ -18,7 +18,7 @@ window.printTree = function (tree, debug) {
         }
         out += ':' + value;
         return out;
-    }));
+    }, start, count));
 };
 
 window.printLinks = function (tree) {
@@ -31,7 +31,7 @@ window.printLinks = function (tree) {
         out +=  left + ' < ' + node.data + ' > ' + right + '\n';
     });
     console.log(out);
-}
+};
 
 test('Set value by index (natural order)', function () {
     var tree = new RBTreeList();
@@ -40,7 +40,6 @@ test('Set value by index (natural order)', function () {
         var match = true;
 
         tree.set(i, letter);
-        printTree(tree)
 
         for (var j = 0; j <= i; j++) {
             var l = tree.get(j).data;
@@ -49,7 +48,7 @@ test('Set value by index (natural order)', function () {
                 match = false;
             }
 
-            deepEqual(alphabet[j], l, 'Correct position');
+            equal(alphabet[j], l, 'Correct position');
         }
 
         ok(match, 'Order is correct after set of "' + letter + '"');
@@ -73,7 +72,7 @@ test('Set value by index (reverse order)', function () {
                 match = false;
             }
 
-            deepEqual(alphabet[j], l, 'Correct position');
+            equal(alphabet[j], l, 'Correct position');
         }
 
         ok(match, 'Order is correct after set of "' + letter + '"');
@@ -84,22 +83,22 @@ test('Set value by index (with gaps between indexes)', function () {
     var tree = new RBTreeList();
 
     tree.set(20, alphabet[20]);
-    deepEqual(tree.get(20).data, alphabet[20]);
+    equal(tree.get(20).data, alphabet[20]);
 
     tree.set(5, alphabet[5]);
-    deepEqual(tree.get(5).data, alphabet[5]);
+    equal(tree.get(5).data, alphabet[5]);
 
     tree.set(15, alphabet[15]);
-    deepEqual(tree.get(15).data, alphabet[15]);
+    equal(tree.get(15).data, alphabet[15]);
 
     tree.set(10, alphabet[10]);
-    deepEqual(tree.get(10).data, alphabet[10]);
+    equal(tree.get(10).data, alphabet[10]);
 
     tree.set(12, alphabet[12]);
-    deepEqual(tree.get(12).data, alphabet[12]);
+    equal(tree.get(12).data, alphabet[12]);
 
     tree.set(11, alphabet[11]);
-    deepEqual(tree.get(11).data, alphabet[11]);
+    equal(tree.get(11).data, alphabet[11]);
 });
 
 test('Gaps are calculated correctly', function () {
@@ -149,7 +148,7 @@ test('Set single value via .splice()', function () {
                 match = false;
             }
 
-            deepEqual(alphabet[j], l, 'Correct position');
+            equal(alphabet[j], l, 'Correct position');
         }
 
         ok(match, 'Order is correct after splice of "' + letter + '"');
@@ -163,7 +162,7 @@ test('Set multiple values via .splice()', function () {
     tree.splice.apply(tree, [0, 0].concat(alphabet));
 
     alphabet.forEach(function (letter, i) {
-        deepEqual(tree.get(i).data, letter, 'Values match');
+        equal(tree.get(i).data, letter, 'Values match');
     });
 });
 
@@ -179,13 +178,44 @@ test('Insert a value between two existing values via .splice()', function () {
 
     tree.splice(middleIndex, 0, splicedValue);
 
-    deepEqual(tree.get(middleIndex - 1).data, alphabet[middleIndex - 1]);
-    deepEqual(tree.get(middleIndex).data, splicedValue);
-    deepEqual(tree.get(middleIndex + 1).data, alphabet[middleIndex]);
+    equal(tree.get(middleIndex - 1).data, alphabet[middleIndex - 1]);
+    equal(tree.get(middleIndex).data, splicedValue);
+    equal(tree.get(middleIndex + 1).data, alphabet[middleIndex]);
 });
 
-test('Remove an item via .remove()', function () {
+test('Delete an item via .unset()', function () {
+    var tree = new RBTreeList();
 
+    // Fill the tree with values
+    tree.splice.apply(tree, [0, 0].concat(alphabet));
+
+    alphabet.forEach(function (letter, index) {
+        tree.unset(index);
+    });
+
+    tree.each(function () {
+        ok(false, 'There should be nothing to iterate');
+    });
+
+    equal(tree.length, alphabet.length, 'Tree length is correct');
+});
+
+test('Remove an item via .unset()', function () {
+    var tree = new RBTreeList();
+
+    // Fill the tree with values
+    tree.splice.apply(tree, [0, 0].concat(alphabet));
+
+    for (var i = alphabet.length - 1; i >= 0; i--) {
+        tree.unset(i, true);
+        printTree(tree);
+    };
+
+    tree.each(function () {
+        ok(false, 'There should be nothing to iterate');
+    });
+
+    equal(tree.length, 0, 'Tree length is correct');
 });
 
 test('Removing a gapped item yields correct length', function () {
@@ -195,14 +225,52 @@ test('Removing a gapped item yields correct length', function () {
     modelList[100] = 'abc';
     tree.set(100, 'abc');
 
-    equal(tree.size, modelList.length, 'Length is correct after insert');
+    equal(tree.length, modelList.length, 'Length is correct after insert');
 
-    modelList.splice(100, 1);
-    tree.remove(100);
+    delete modelList[100];
+    tree.unset(100);
 
-    equal(tree.size, modelList.length, 'Length is correct after remove');
+    equal(tree.length, modelList.length, 'Length is correct after remove');
 });
 
+test('Removing a node links the prev/next nodes', function () {
+    var tree = new RBTreeList();
+
+    // Fill the tree with values
+    tree.splice.apply(tree, [0, 0].concat(alphabet));
+
+    var root = tree._root;
+    var rootIndex = tree.indexOfNode(root);
+    var prev = root.prev;
+    var next = root.next;
+
+    tree.unset(rootIndex);
+
+    // NOTE: Don't use .equal() to compare nodes, it causes endless recursion
+    ok(prev.next === next, '`prev` node was linked to `next` node');
+    ok(next.prev === prev, '`next` node was linked ot `prev` node');
+});
+
+test('Removing a gapped item redistributes the gap', function () {
+    var tree = new RBTreeList();
+    var next;
+
+    tree.set(0, 'A');
+    tree.set(1, 'B');
+    tree.set(2, 'C');
+
+    tree.set(10, 'N');
+    next = tree.set(20, 'O');
+    tree.set(30, 'P');
+
+    tree.set(33, 'Y');
+    tree.set(33, 'Z');
+
+    tree.unset(10);
+
+    equal(next.leftGapCount, 17,
+        'Removed item\'s next sibling is gapped correctly');
+});
 
 test('Remove a single value via .splice()', function () {
     var tree = new RBTreeList();
@@ -215,41 +283,46 @@ test('Remove a single value via .splice()', function () {
     // "removed items" list
     var removedNode = tree.splice(length - 1, 1).shift();
 
-    deepEqual(removedNode.data, alphabet[length - 1], 'Removed node matches');
+    equal(removedNode.data, alphabet[length - 1], 'Removed node matches');
 
     var nodeAtRemovedIndex = tree.get(length - 1);
 
-    deepEqual(nodeAtRemovedIndex, null, 'Node removed from tree');
+    ok(nodeAtRemovedIndex === null, 'Node removed from tree');
 
     // Remove the first value, then get the node from the returned
     // "removed items" list
     removedNode = tree.splice(0, 1).shift();
 
-    deepEqual(removedNode.data, alphabet[0], 'Removed node matches');
+    equal(removedNode.data, alphabet[0], 'Removed node matches');
 
     // Should return the NEXT item in the list, after the removed item
     var dataAtRemovedIndex = tree.get(0).data;
 
-    deepEqual(dataAtRemovedIndex, alphabet[1], 'Node removed from tree');
+    ok(dataAtRemovedIndex === alphabet[1], 'Node removed from tree');
 });
 
 test('Remove multiple values via .splice()', function () {
     var tree = new RBTreeList();
+    var modelList = alphabet.slice(0);
     var length = alphabet.length;
 
     // Fill the tree with values
     tree.splice.apply(tree, [0, 0].concat(alphabet));
 
     var removedNodes = tree.splice(1, length - 2);
+    var removedLetters = modelList.splice(1, length - 2);
+
+    equal(removedNodes.length, removedLetters.length,
+        'Correct number of nodes removed');
 
     removedNodes.forEach(function (node, i) {
         i = i+1;
 
-        deepEqual(node.data, alphabet[i], 'Removed values match');
+        equal(node.data, alphabet[i], 'Removed values match');
     });
 
-    deepEqual(tree.get(0).data, alphabet[0], 'Remaining values match');
-    deepEqual(tree.get(1).data, alphabet[length - 1], 'Remaining values match');
+    equal(tree.get(0).data, modelList[0], 'Remaining values match');
+    equal(tree.get(1).data, modelList[1], 'Remaining values match');
 });
 
 test('Replacing a value with .splice() creates a new Node', function () {
@@ -261,7 +334,7 @@ test('Replacing a value with .splice() creates a new Node', function () {
     var removedNode = tree.splice(0, 1, alphabet[0]).shift();
 
     notDeepEqual(removedNode, tree.get(0).data, 'Nodes are not the same');
-    deepEqual(removedNode.data, tree.get(0).data, 'Node values are the same');
+    equal(removedNode.data, tree.get(0).data, 'Node values are the same');
 });
 
 test('Negative removeCount works with .splice()', function () {
@@ -275,11 +348,11 @@ test('Negative removeCount works with .splice()', function () {
     removedNodes.forEach(function (node, i) {
         i = alphabet.length - 3 + i;
 
-        deepEqual(node.data, alphabet[i], 'Removed values match');
+        equal(node.data, alphabet[i], 'Removed values match');
     });
 
     for (var i = 0; i < alphabet.length - 3; i++) {
-        deepEqual(tree.get(i).data, alphabet[i], 'Remaining values match');
+        equal(tree.get(i).data, alphabet[i], 'Remaining values match');
     }
 });
 
@@ -293,21 +366,22 @@ test('Insert and remove simultaneously with .splice()', function () {
 
     var removedNode = tree.splice(replaceIndex, 1, doubledValue).shift();
 
-    deepEqual(removedNode.data, alphabet[replaceIndex],
+    equal(removedNode.data, alphabet[replaceIndex],
         'Removed value matches');
 
     var node = tree.get(replaceIndex);
 
-    deepEqual(node.data, doubledValue, 'Inserted value matches');
+    equal(node.data, doubledValue, 'Inserted value matches');
 });
 
 test('Nodes are linked (parent, prev, next)', function () {
-    var tree = window.tree = new RBTreeList();
+    var tree = new RBTreeList();
     var cursor, node, parent;
 
     alphabet.forEach(function (letter, i) {
 
         node = tree.set(i, letter);
+        printTree(tree, false);
 
         equal(node.data, letter, '"' + letter + '" set');
 
@@ -325,7 +399,7 @@ test('Nodes are linked (parent, prev, next)', function () {
                 parent = parent.parent;
             }
 
-            equal(parent.data, tree._root.data, 'Reached root via linked parent');
+            ok(parent === tree._root, 'Reached root via linked parent');
 
             // Iterate nodes via link
             cursor = cursor.next;
@@ -341,7 +415,7 @@ test('Get index of each node', function () {
     tree.splice.apply(tree, [0, 0].concat(alphabet));
 
     tree.each(function (node, i) {
-        deepEqual(tree.indexOfNode(node), i, 'Index is correct');
+        equal(tree.indexOfNode(node), i, 'Index is correct');
     });
 });
 
@@ -353,14 +427,14 @@ test('"Holey" indexes are not enumerable', function () {
 
     expected = ['C'];
     tree.each(function (node, i) {
-        deepEqual(node.data, expected.shift());
+        equal(node.data, expected.shift());
     });
 
     tree.set(0, undefined);
 
     expected = [undefined, 'C'];
     tree.each(function (node, i) {
-        deepEqual(node.data, expected.shift());
+        equal(node.data, expected.shift());
     });
 });
 
@@ -373,8 +447,8 @@ test('Remove value by index', function () {
     });
 
     for (var i = alphabet.length - 1; i >= 0; i--) {
-        n = tree.remove(i);
-        deepEqual(n.data, alphabet[i], 'Correct item removed');
+        n = tree.unset(i);
+        equal(n.data, alphabet[i], 'Correct item removed');
     }
 });
 
@@ -403,7 +477,7 @@ test('leftCount is maintained on add and remove', function () {
                 match = false;
             }
 
-            deepEqual(count, storedCount, 'Count from "' + node.data + '"');
+            equal(count, storedCount, 'Count from "' + node.data + '"');
         }
 
         return (isChild ? count : match);
@@ -421,7 +495,7 @@ test('leftCount is maintained on add and remove', function () {
 
             if (letter.length) {
                 letter = letter.shift();
-                tree.remove(index, letter);
+                tree.unset(index, true);
                 match = recursiveChildCountTest(tree._root);
                 ok(match, 'Child count is correct after removing "' + letter + '"');
                 i++;
@@ -435,7 +509,7 @@ test('leftCount is maintained on add and remove', function () {
         }
     };
 
-    var tree = window.tree = new RBTreeList();
+    var tree = new RBTreeList();
     var match;
 
     alphabet.forEach(function (letter, i) {
@@ -448,7 +522,7 @@ test('leftCount is maintained on add and remove', function () {
 
 });
 
-test('10k', function () {
+test('Set/get/unset 10k items', function () {
     var url = 'samples/10k';
     var req = new XMLHttpRequest();
 
@@ -460,7 +534,7 @@ test('10k', function () {
         var operations = this.responseText.split('\n');
         var modelList = [];
 
-        var tree = new RBTreeList();
+        var tree = window.tree = new RBTreeList();
         operations.forEach(function (operation, i) {
             operation = Math.round(operation / 100000);
             var index = Math.abs(operation);
@@ -469,24 +543,63 @@ test('10k', function () {
             console.log('Operation:', operation);
 
             if (operation > 0) {
-                modelList[index] = i;
+                modelList[index] = index;
 
                 node = tree.set(index, index);
                 ok(node instanceof RBTreeList.prototype.Node, 'Set returned a Node');
-                equal(node.data, index, 'Returned node has correct data');
+                equal(node.data, index, 'Set node has correct data');
 
                 node = tree.get(index);
                 ok(node instanceof RBTreeList.prototype.Node, 'Get returned a Node');
-                equal(node.data, index, 'Returned node has correct data');
+                equal(node.data, index, 'Get\'s returned node has correct data');
             } else {
-                modelList.splice(index, 1);
-                // node = tree.get(index);
-                // equal(tree.remove(index), node, '.remove() returned the same node');
-                tree.remove(index)
-                ok(false, 'Cannot get reference to correct node on .remove()');
+                delete modelList[index];
+                node = tree.unset(index);
+                ok(node instanceof RBTreeList.prototype.Node, 'Remove returned a Node');
+                equal(node.data, index, 'Removed node has correct data');
             }
 
-            equal(tree.size, modelList.length, 'Length is correct');
+            // Check node.next
+            var cursor = tree.first();
+
+            while (cursor) {
+                index = tree.indexOfNode(cursor)
+                equal(cursor.data, modelList[index], 'Next node matches model');
+
+                parent = cursor;
+
+                // Crawl parents
+                while (parent.parent) {
+                    parent = parent.parent;
+                }
+
+                ok(parent === tree._root, 'Reached root via linked parent');
+
+                // Iterate nodes via link
+                cursor = cursor.next;
+            }
+
+            // Check node.prev
+            cursor = tree.last();
+
+            while (cursor) {
+                index = tree.indexOfNode(cursor)
+                equal(cursor.data, modelList[index], 'Prev node matches model');
+
+                parent = cursor;
+
+                // Crawl parents
+                while (parent.parent) {
+                    parent = parent.parent;
+                }
+
+                ok(parent === tree._root, 'Reached root via linked parent');
+
+                // Iterate nodes via link
+                cursor = cursor.prev;
+            }
+
+            equal(tree.length, modelList.length, 'Length is correct');
 
             printTree(tree, false);
         });
@@ -495,4 +608,3 @@ test('10k', function () {
     req.open("get", url, true);
     req.send();
 });
-
