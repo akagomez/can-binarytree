@@ -119,13 +119,9 @@ test('Setting the value of gappped index doesn\'t effect subsequent indices' , f
     var tree = new RBTreeList();
 
     var node1 = tree.set(25, alphabet[25]);
-    printTree(tree);
     var node2 = tree.set(20, alphabet[20]);
-    printTree(tree);
     var node3 = tree.set(15, alphabet[15]);
-    printTree(tree);
     var node4 = tree.set(10, alphabet[10]);
-    printTree(tree);
 
     equal(tree.indexOfNode(node1), 25);
     equal(tree.indexOfNode(node2), 20);
@@ -208,7 +204,6 @@ test('Remove an item via .unset()', function () {
 
     for (var i = alphabet.length - 1; i >= 0; i--) {
         tree.unset(i, true);
-        printTree(tree);
     };
 
     tree.each(function () {
@@ -376,12 +371,13 @@ test('Insert and remove simultaneously with .splice()', function () {
 
 test('Nodes are linked (parent, prev, next)', function () {
     var tree = new RBTreeList();
+    var modelList = [];
     var cursor, node, parent;
 
     alphabet.forEach(function (letter, i) {
 
+        modelList[i] = letter;
         node = tree.set(i, letter);
-        printTree(tree, false);
 
         equal(node.data, letter, '"' + letter + '" set');
 
@@ -404,6 +400,27 @@ test('Nodes are linked (parent, prev, next)', function () {
             // Iterate nodes via link
             cursor = cursor.next;
             i++;
+        }
+
+        cursor = tree.last();
+        i = modelList.length - 1;
+
+        while (cursor) {
+
+            equal(cursor.data, modelList[i], 'Prev node matches model');
+
+            parent = cursor;
+
+            // Crawl parents
+            while (parent.parent) {
+                parent = parent.parent;
+            }
+
+            ok(parent === tree._root, 'Reached root via linked parent');
+
+            // Iterate nodes via link
+            cursor = cursor.prev;
+            i--;
         }
     });
 });
@@ -536,72 +553,29 @@ test('Set/get/unset 10k items', function () {
 
         var tree = window.tree = new RBTreeList();
         operations.forEach(function (operation, i) {
-            operation = Math.round(operation / 100000);
+
             var index = Math.abs(operation);
             var node;
 
-            console.log('Operation:', operation);
-
             if (operation > 0) {
                 modelList[index] = index;
-
+                // equal(modelList[index], index)
                 node = tree.set(index, index);
-                ok(node instanceof RBTreeList.prototype.Node, 'Set returned a Node');
-                equal(node.data, index, 'Set node has correct data');
+                ok(node instanceof RBTreeList.prototype.Node, '.set() returned a Node');
+                equal(node.data, index, '.set()\'s returned node has correct data');
 
                 node = tree.get(index);
                 ok(node instanceof RBTreeList.prototype.Node, 'Get returned a Node');
-                equal(node.data, index, 'Get\'s returned node has correct data');
+                equal(node.data, index, '.get()\'s returned node has correct data');
             } else {
                 delete modelList[index];
+                // equal(modelList[index], undefined)
                 node = tree.unset(index);
                 ok(node instanceof RBTreeList.prototype.Node, 'Remove returned a Node');
                 equal(node.data, index, 'Removed node has correct data');
             }
 
-            // Check node.next
-            var cursor = tree.first();
-
-            while (cursor) {
-                index = tree.indexOfNode(cursor)
-                equal(cursor.data, modelList[index], 'Next node matches model');
-
-                parent = cursor;
-
-                // Crawl parents
-                while (parent.parent) {
-                    parent = parent.parent;
-                }
-
-                ok(parent === tree._root, 'Reached root via linked parent');
-
-                // Iterate nodes via link
-                cursor = cursor.next;
-            }
-
-            // Check node.prev
-            cursor = tree.last();
-
-            while (cursor) {
-                index = tree.indexOfNode(cursor)
-                equal(cursor.data, modelList[index], 'Prev node matches model');
-
-                parent = cursor;
-
-                // Crawl parents
-                while (parent.parent) {
-                    parent = parent.parent;
-                }
-
-                ok(parent === tree._root, 'Reached root via linked parent');
-
-                // Iterate nodes via link
-                cursor = cursor.prev;
-            }
-
             equal(tree.length, modelList.length, 'Length is correct');
-
-            printTree(tree, false);
         });
     });
 
