@@ -1,7 +1,7 @@
 var QUnit = require("steal-qunit");
 var RBTreeList = window.RBTreeList = require('../lib/rbtreelist');
 
-QUnit.module('can-rbtree-list', {
+QUnit.module('can-rbtreelist', {
     setup: function () {}
 });
 
@@ -40,6 +40,28 @@ test('Set value by index (natural order)', function () {
         var match = true;
 
         tree.set(i, letter);
+
+        for (var j = 0; j <= i; j++) {
+            var l = tree.get(j).data;
+
+            if (alphabet[j] !== l) {
+                match = false;
+            }
+
+            equal(alphabet[j], l, 'Correct position');
+        }
+
+        ok(match, 'Order is correct after set of "' + letter + '"');
+    });
+});
+
+test('Add node with .push()', function () {
+    var tree = new RBTreeList();
+
+    alphabet.forEach(function (letter, i) {
+        var match = true;
+
+        tree.push(letter);
 
         for (var j = 0; j <= i; j++) {
             var l = tree.get(j).data;
@@ -425,7 +447,7 @@ test('Nodes are linked (parent, prev, next)', function () {
     });
 });
 
-test('Get index of each node', function () {
+test('Get the index of a node', function () {
     var tree = new RBTreeList();
 
     // Fill the tree with values
@@ -433,6 +455,17 @@ test('Get index of each node', function () {
 
     tree.each(function (node, i) {
         equal(tree.indexOfNode(node), i, 'Index is correct');
+    });
+});
+
+test('Get the index of a value', function () {
+    var tree = new RBTreeList();
+
+    // Fill the tree with values
+    tree.splice.apply(tree, [0, 0].concat(alphabet));
+
+    alphabet.forEach(function (letter, i) {
+        equal(tree.indexOf(letter), i, 'Index is correct');
     });
 });
 
@@ -469,7 +502,7 @@ test('Remove value by index', function () {
     }
 });
 
-test('leftCount is maintained on add and remove', function () {
+test('leftCount is maintained on set and unset', function () {
 
     var recursiveChildCountTest = function (node, isChild) {
         var match = true;
@@ -539,7 +572,7 @@ test('leftCount is maintained on add and remove', function () {
 
 });
 
-test('Set/get/unset 10k items', function () {
+test('Set/get/unset 10k items (by known index)', function () {
     var url = 'samples/10k';
     var req = new XMLHttpRequest();
 
@@ -551,7 +584,7 @@ test('Set/get/unset 10k items', function () {
         var operations = this.responseText.split('\n');
         var modelList = [];
 
-        var tree = window.tree = new RBTreeList();
+        var tree = new RBTreeList();
         operations.forEach(function (operation, i) {
 
             var index = Math.abs(operation);
@@ -559,7 +592,7 @@ test('Set/get/unset 10k items', function () {
 
             if (operation > 0) {
                 modelList[index] = index;
-                // equal(modelList[index], index)
+
                 node = tree.set(index, index);
                 ok(node instanceof RBTreeList.prototype.Node, '.set() returned a Node');
                 equal(node.data, index, '.set()\'s returned node has correct data');
@@ -569,7 +602,7 @@ test('Set/get/unset 10k items', function () {
                 equal(node.data, index, '.get()\'s returned node has correct data');
             } else {
                 delete modelList[index];
-                // equal(modelList[index], undefined)
+
                 node = tree.unset(index);
                 ok(node instanceof RBTreeList.prototype.Node, 'Remove returned a Node');
                 equal(node.data, index, 'Removed node has correct data');
@@ -581,4 +614,46 @@ test('Set/get/unset 10k items', function () {
 
     req.open("get", url, true);
     req.send();
+});
+
+test('Add/remove 1k items (by indexOf)', function () {
+
+    var tree = new RBTreeList();
+    var modelList = [];
+    var index, modelIndex, modelRemoved, node, treeIndex, treeRemoved, value,
+        operation;
+
+    for (var i = 0; i < 2000; i++) {
+
+        value = parseInt(i, 16);
+
+        if (i < 1000) {
+            modelList.push(value);
+
+            node = tree.push(value);
+            ok(node instanceof RBTreeList.prototype.Node, '.push() returned a Node');
+            equal(node.data, value, '.push()\'s returned node has correct data');
+
+            index = tree.indexOf(value);
+            equal(index, modelList.length - 1, '.indexOf() returned correct index');
+            equal(tree.length, modelList.length, 'Length is correct');
+        } else {
+            modelIndex = modelList.indexOf(value);
+            modelRemoved = modelList.splice(modelIndex, 1);
+
+            treeIndex = tree.indexOf(value);
+            treeRemoved = tree.splice(treeIndex, 1);
+
+            equal(treeIndex, modelIndex, 'Indices match');
+
+            treeRemoved.forEach(function (node, i) {
+                equal(node.data, modelRemoved[i], 'Removed item matches model');
+            });
+
+            equal(tree.length, modelList.length, 'Length is correct');
+        }
+
+        equal(tree.length, modelList.length, 'Length is correct');
+    }
+
 });
