@@ -650,24 +650,31 @@ test('Set/get/unset 10k items (by known index)', function () {
 
 test('Add/remove 1k items (by indexOf)', function () {
 
+    var iterations = 1000;
     var tree = new RBTreeList();
     var modelList = [];
     var index, modelIndex, modelRemoved, node, treeIndex, treeRemoved, value,
         operation;
 
-    for (var i = 0; i < 2000; i++) {
+    for (var i = 0; i < iterations * 2; i++) {
 
+        // Generate a logical unique value (hex)
         value = parseInt(i, 16);
 
-        if (i < 1000) {
-            modelList.push(value);
+        if (i < iterations) {
 
-            node = tree.push(value);
-            ok(node instanceof RBTreeList.prototype.Node, '.push() returned a Node');
-            equal(node.data, value, '.push()\'s returned node has correct data');
+            // Alternate push/unshift
+            method = (i % 2 === 0 ? 'push' : 'unshift');
+            modelList[method](value);
+            node = tree[method](value);
+
+            ok(node instanceof RBTreeList.prototype.Node, 'Returned a Node');
+            equal(node.data, value, 'Returned node has correct data');
 
             index = tree.indexOf(value);
-            equal(index, modelList.length - 1, '.indexOf() returned correct index');
+            modelIndex = modelList.indexOf(value);
+
+            equal(index, modelIndex, 'Evaluated index correctly');
             equal(tree.length, modelList.length, 'Length is correct');
         } else {
             modelIndex = modelList.indexOf(value);
