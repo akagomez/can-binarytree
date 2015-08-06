@@ -1,7 +1,7 @@
 var can = require('can/util/util');
 var Map = require('can/map/map');
 var Construct = require('can/construct/construct');
-var TreeLib = require('./lib/rbtree');
+var TreeLib = require('./lib/rbtreelist');
 
 // Copy
 var treeLibProto = can.simpleExtend({}, TreeLib.prototype);
@@ -18,41 +18,45 @@ can.RedBlackTree = can.Construct.extend(can.simpleExtend(treeLibProto, {
     // Save a reference to the TreeLib prototype methods
     _parent: TreeLib.prototype,
 
-    // Trigger a "add" event on successful insert
-    insert: function (data) {
-        var insertIndex = TreeLib.prototype.insert.apply(this, arguments);
+    // Trigger a "add" event when length increases
+    set: function (index) {
+        var lastLength = this.length;
+        var node = TreeLib.prototype.set.apply(this, arguments);
 
-        if (insertIndex >= 0) {
-            this.dispatch('add', [[data], insertIndex]);
+        if (this.length > lastLength) {
+            this.dispatch('add', [[node.data], index]);
         }
 
-        return insertIndex;
+        return node;
     },
 
-    // Trigger a "remove" event on successful insert
-    remove: function (data) {
+    // Trigger a "remove" event when length decreases
+    unset: function (index) {
 
-        // Get the node data before its removed from the tree
-        var nodeData = this.find(data);
+        var lastLength = this.length;
 
-        // Remove, and get the index
-        var removeIndex = TreeLib.prototype.remove.apply(this, arguments);
+        // Unset or remove
+        var node = TreeLib.prototype.unset.apply(this, arguments);
 
-        if (removeIndex >= 0) {
-            this.dispatch('remove', [[nodeData], removeIndex]);
+        if (this.length < lastLength) {
+            this.dispatch('remove', [[node.data], index]);
         }
 
-        return removeIndex;
+        return node;
     },
 
-    attr: function (index) {
+    attr: function (index, value) {
+
+        var items, node;
 
         // Return a list all the nodes' data
         if (arguments.length === 0) {
-            var items = [];
+            items = [];
 
             this.each(function (item) {
-                if (item instanceof can.Map) {
+
+                // Convert can.Map's/can.List's to objects/arrays
+                if (item instanceof can.Map || item instanceof can.List) {
                     item = item.attr();
                 }
 
@@ -63,28 +67,22 @@ can.RedBlackTree = can.Construct.extend(can.simpleExtend(treeLibProto, {
 
         // Get the data of a node by index
         } else if (arguments.length === 1) {
-            var data = this.getByIndex(index);
 
-            // Node.data
-            return data !== null  ? data : undefined;
+            node = this.get(index);
+            return node ? node.data : undefined;
 
         // Set the data of a node by index
         } else if (arguments.length === 2) {
 
-            // TODO
-
+            node = this.set(index, value);
+            return node;
         }
     },
 
-    // Add an index to the `each` callback
+    // Pass the node data to the callback instead of the node
     each: function (callback) {
-
-        // Track the index manually rather than having the tree calculate it
-        var i = 0;
-
-        TreeLib.prototype.each.call(this, function (data) {
-            var result = callback(data, i);
-            i++;
+        TreeLib.prototype.each.call(this, function (node, i) {
+            var result = callback(node.data, i);
             return result;
         });
     }
