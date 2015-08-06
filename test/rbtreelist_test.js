@@ -137,6 +137,63 @@ test('Gaps are calculated correctly', function () {
     equal(node.leftGapCount, 4);
 });
 
+test('Gaps can be disabled (natural order)', function () {
+    var tree = new RBTreeList();
+    var index = 0;
+
+    // Disable gap
+    tree._gapAndSize = function () {
+        this.length++;
+    };
+
+    // Replace default index logic
+    tree._comparator = function (_a, _b) {
+        var a = _a instanceof this.Node ? alphabet.indexOf(_a.data) : _a;
+        var b = _b instanceof this.Node ? alphabet.indexOf(_b.data) : _b;
+        return a === b ? 0 : a < b ? -1 : 1; // ASC
+    };
+
+    for (var i = 0; i < alphabet.length; i += 2) {
+        var letter = alphabet[i];
+        var node = tree.set(i, letter);
+
+        equal(node.data, letter, 'Value matches');
+        equal(tree.indexOfNode(node), index, 'Index excludes gap');
+        equal(tree.length, index + 1, 'Length matches gapless index + 1');
+
+        index++;
+    }
+});
+
+test('Gaps can be disabled (reverse order)', function () {
+    var tree = new RBTreeList();
+    var length = 1;
+
+    // Disable gap
+    tree._gapAndSize = function () {
+        this.length++;
+    };
+
+    // Replace default index logic
+    tree._comparator = function (_a, _b) {
+        var a = _a instanceof this.Node ? alphabet.indexOf(_a.data) : _a;
+        var b = _b instanceof this.Node ? alphabet.indexOf(_b.data) : _b;
+        return a === b ? 0 : a < b ? -1 : 1; // ASC
+    };
+
+    for (var i = alphabet.length - 1; i >= 0; i -= 2) {
+        var letter = alphabet[i];
+        var node = tree.set(i, letter);
+
+        equal(node.data, letter, 'Value matches');
+        equal(tree.indexOfNode(node), 0, 'Index excludes gap');
+        equal(tree.length, length, 'Length matches gapless index + 1');
+
+        length++;
+    }
+});
+
+
 test('Setting the value of gappped index doesn\'t effect subsequent indices' , function () {
     var tree = new RBTreeList();
 
