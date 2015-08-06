@@ -8,31 +8,6 @@ QUnit.module('can-rbtreelist', {
 var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 // var alphabet = "ABCDEF".split("");
 
-window.printTree = function (tree, debug, start, count) {
-    console.log(tree.print(function (node) {
-        var index = tree.indexOfNode(node);
-        var value = (node.data === undefined ? '_' : node.data);
-        var out =  index;
-        if (debug !== false) {
-            out += '(' +node.leftCount + '|' + node.leftGapCount + '|' + node.rightCount + ')';
-        }
-        out += ':' + value;
-        return out;
-    }, start, count));
-};
-
-window.printLinks = function (tree) {
-    var out = '';
-    tree.each(function (node, index) {
-        var left = (node.prev && node.prev.data);
-        var right = (node.next && node.next.data);
-        left = left ? left : '_';
-        right = right ? right : '_';
-        out +=  left + ' < ' + node.data + ' > ' + right + '\n';
-    });
-    console.log(out);
-};
-
 test('Set value by index (natural order)', function () {
     var tree = new RBTreeList();
 
