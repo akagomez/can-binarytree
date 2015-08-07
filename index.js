@@ -41,10 +41,16 @@ can.TreeList = can.Construct.extend(can.simpleExtend(treeLibProto, {
         var removeIndex;
 
         // Unset or remove
-        var node = TreeLib.prototype.unset.apply(this, arguments);
+        var node = this.get(index);
+
+        if (node) {
+            // The index that retrieves the node and the index
+            // that the node resides can be different
+            removeIndex = this.indexOfNode(node);
+            TreeLib.prototype.unset.apply(this, arguments);
+        }
 
         if (this.length < lastLength) {
-            removeIndex = this.indexOfNode(node);
             this._dispatchRemove(node, removeIndex);
             this._dispatchLength();
         }
