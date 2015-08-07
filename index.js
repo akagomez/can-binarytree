@@ -1,4 +1,3 @@
-var can = require('can/util/util');
 var Map = require('can/map/map');
 var Construct = require('can/construct/construct');
 var TreeLib = require('./lib/rbtreelist');

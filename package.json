@@ -23,7 +23,7 @@
     "test": "testee test/index.html && nodeunit ./test/test_*.js && jshint lib/*.js index.js"
   },
   "dependencies": {
-    "can": "2.2.X"
+    "can": "git://github.com/bitovi/canjs.git#todomvc-and-can-derive"
   },
   "devDependencies": {
     "jshint": "0.5.9",
