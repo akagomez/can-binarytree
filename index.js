@@ -7,7 +7,7 @@ var TreeLib = require('./lib/rbtreelist');
 var treeLibProto = can.simpleExtend({}, TreeLib.prototype);
 
 // Save to "can" namespace
-can.RedBlackTree = can.Construct.extend(can.simpleExtend(treeLibProto, {
+can.TreeList = can.Construct.extend(can.simpleExtend(treeLibProto, {
 
     init: function () {
 
@@ -101,7 +101,7 @@ can.RedBlackTree = can.Construct.extend(can.simpleExtend(treeLibProto, {
 }));
 
 // Add event utilities
-can.extend(can.RedBlackTree.prototype, can.event);
+can.extend(can.TreeList.prototype, can.event);
 
-module.exports = can.RedBlackTree;
+module.exports = can.TreeList;
 
