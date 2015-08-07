@@ -24,7 +24,7 @@ can.RedBlackTree = can.Construct.extend(can.simpleExtend(treeLibProto, {
         var node = TreeLib.prototype.set.apply(this, arguments);
 
         if (this.length > lastLength) {
-            this.dispatch('add', [[node.data], index]);
+            this.dispatch('add', [[node], index]);
         }
 
         return node;
@@ -39,7 +39,7 @@ can.RedBlackTree = can.Construct.extend(can.simpleExtend(treeLibProto, {
         var node = TreeLib.prototype.unset.apply(this, arguments);
 
         if (this.length < lastLength) {
-            this.dispatch('remove', [[node.data], index]);
+            this.dispatch('remove', [[node], index]);
         }
 
         return node;
@@ -69,7 +69,7 @@ can.RedBlackTree = can.Construct.extend(can.simpleExtend(treeLibProto, {
         } else if (arguments.length === 1) {
 
             node = this.get(index);
-            return node ? node.data : undefined;
+            return node ? node : undefined;
 
         // Set the data of a node by index
         } else if (arguments.length === 2) {
@@ -77,14 +77,6 @@ can.RedBlackTree = can.Construct.extend(can.simpleExtend(treeLibProto, {
             node = this.set(index, value);
             return node;
         }
-    },
-
-    // Pass the node data to the callback instead of the node
-    each: function (callback) {
-        TreeLib.prototype.each.call(this, function (node, i) {
-            var result = callback(node.data, i);
-            return result;
-        });
     }
 
 }));
