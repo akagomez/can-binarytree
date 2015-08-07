@@ -1,5 +1,5 @@
 var QUnit = require("steal-qunit");
-var RBTreeList = window.RBTreeList = require('../lib/rbtreelist');
+var RBTreeList = window.RBTreeList = require('../index');
 
 QUnit.module('can-rbtreelist', {
     setup: function () {}
@@ -115,6 +115,7 @@ test('Gaps are calculated correctly', function () {
 test('Gaps can be disabled (natural order)', function () {
     var tree = new RBTreeList();
     var index = 0;
+    var modelList = [];
 
     // Disable gap
     tree._gapAndSize = function () {
@@ -128,16 +129,33 @@ test('Gaps can be disabled (natural order)', function () {
         return a === b ? 0 : a < b ? -1 : 1; // ASC
     };
 
+    // Make sure index reported is of the filtered list, not the alphabet
+    tree.bind('add', function (ev, items, offset) {
+
+        ok(items.length, 1, 'Only one item was added');
+
+        items.forEach(function (node, index) {
+            var value = node.data;
+            equal(offset + index, modelList.indexOf(value),
+                'Add event reports correct index');
+        });
+    });
+
     for (var i = 0; i < alphabet.length; i += 2) {
         var letter = alphabet[i];
+        modelList[index] = letter;
         var node = tree.set(i, letter);
 
+        var treeIndex = tree.indexOfNode(node);
+        var modelIndex = modelList.indexOf(letter);
+
         equal(node.data, letter, 'Value matches');
-        equal(tree.indexOfNode(node), index, 'Index excludes gap');
-        equal(tree.length, index + 1, 'Length matches gapless index + 1');
+        equal(treeIndex, modelIndex, 'Index excludes gap');
+        equal(tree.length, modelList.length, 'Length matches modelList');
 
         index++;
     }
+
 });
 
 test('Gaps can be disabled (reverse order)', function () {

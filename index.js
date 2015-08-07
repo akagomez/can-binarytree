@@ -21,10 +21,14 @@ can.RedBlackTree = can.Construct.extend(can.simpleExtend(treeLibProto, {
     // Trigger a "add" event when length increases
     set: function (index) {
         var lastLength = this.length;
+        var insertIndex;
+
         var node = TreeLib.prototype.set.apply(this, arguments);
 
         if (this.length > lastLength) {
-            this.dispatch('add', [[node], index]);
+            insertIndex = this.indexOfNode(node);
+            this._dispatchAdd(node, insertIndex);
+            this._dispatchLength(lastLength);
         }
 
         return node;
@@ -34,15 +38,30 @@ can.RedBlackTree = can.Construct.extend(can.simpleExtend(treeLibProto, {
     unset: function (index) {
 
         var lastLength = this.length;
+        var removeIndex;
 
         // Unset or remove
         var node = TreeLib.prototype.unset.apply(this, arguments);
 
         if (this.length < lastLength) {
-            this.dispatch('remove', [[node], index]);
+            removeIndex = this.indexOfNode(node);
+            this._dispatchRemove(node, removeIndex);
+            this._dispatchLength();
         }
 
         return node;
+    },
+
+    _dispatchAdd: function (node, index) {
+        this.dispatch('add', [[node], index]);
+    },
+
+    _dispatchRemove: function (node, index) {
+        this.dispatch('remove', [[node], index]);
+    },
+
+    _dispatchLength: function () {
+        this.dispatch('length', [this.length]);
     },
 
     attr: function (index, value) {
