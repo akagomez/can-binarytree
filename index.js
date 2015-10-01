@@ -1,4 +1,4 @@
-var Map = require('can/map/map');
+var List = require('can/list/list');
 var Construct = require('can/construct/construct');
 var TreeLib = require('./lib/rbtreelist');
 
@@ -6,12 +6,12 @@ var TreeLib = require('./lib/rbtreelist');
 var treeLibProto = can.simpleExtend({}, TreeLib.prototype);
 
 // Save to "can" namespace
-can.TreeList = can.Construct.extend(can.simpleExtend(treeLibProto, {
+can.TreeList = can.List.extend(can.simpleExtend(treeLibProto, {
 
     init: function () {
 
         // Call the original constructor
-        TreeLib.apply(this, arguments);
+        return TreeLib.apply(this, arguments);
     },
 
     // Save a reference to the TreeLib prototype methods
@@ -26,15 +26,14 @@ can.TreeList = can.Construct.extend(can.simpleExtend(treeLibProto, {
 
         if (this.length > lastLength) {
             insertIndex = this.indexOfNode(node);
-            this._dispatchAdd(node, insertIndex);
-            this._dispatchLength(lastLength);
+            this._triggerChange(insertIndex, 'add', [node], undefined);
         }
 
         return node;
     },
 
     // Trigger a "remove" event when length decreases
-    unset: function (index) {
+    unset: function (index, remove) {
 
         var lastLength = this.length;
         var removeIndex;
@@ -42,71 +41,82 @@ can.TreeList = can.Construct.extend(can.simpleExtend(treeLibProto, {
         // Unset or remove
         var node = this.get(index);
 
+
         if (node) {
-            // The index that retrieves the node and the index
-            // that the node resides can be different
+            // Get the actual index not taking into consideration the
+            // consideration the comparator
             removeIndex = this.indexOfNode(node);
+
+            // Notify interested parties that we are going
+            // to remove a node from the tree
+            if (remove) {
+
+                // If another TreeList is bound to this TreeList it needs an
+                // opportunity to reference this TreeList to evaluate
+                // "source indexes" before the remove so that it can apply the
+                // same change on its end if necessary
+                // WARNING: This event cannot be batched, which is why we
+                // don't call `can.batch.trigger` or `this._triggerChange`.
+                // If it was the remove would happen before the bound TreeList
+                // recieved this event,
+                can.trigger(this, 'pre-remove', [[node], index]);
+            }
+
             TreeLib.prototype.unset.apply(this, arguments);
         }
 
+        // Only fire a remove event if the length has changed
         if (this.length < lastLength) {
-            this._dispatchRemove(node, removeIndex);
-            this._dispatchLength();
+            this._triggerChange(removeIndex, 'remove', undefined, [node]);
         }
 
         return node;
     },
 
-    _dispatchAdd: function (node, index) {
-        this.dispatch('add', [[node], index]);
+    // Prevent calling can.List.prototype.__set becuase it attempts to handle
+    // holey array values, which the RBTreeList already handles
+    __set: can.Map.prototype.__set,
+
+    // Use our public "set" method internally to commit values
+    ___set: function () {
+        return this.set.apply(this, arguments);
     },
 
-    _dispatchRemove: function (node, index) {
-        this.dispatch('remove', [[node], index]);
+    // Use our public "get" method internally to get values
+    ___get: function (attr) {
+
+        // Don't use the "get" API to read the length (it won't work);
+        // Instead read the statically maintained value from the TreeList
+        // NOTE: At this point "length" will already be bound to by __get
+        if (attr === 'length') {
+            return this.length;
+        }
+
+        return this.get.apply(this, arguments)
     },
 
-    _dispatchLength: function () {
-        this.dispatch('length', [this.length]);
-    },
+    // The default _triggerChange doesn't dispatch the "pre-remove" event
+    // we added for the TreeList, so we handle it here. Unfortunately it's
+    // almost entirely a copy/paste job
+    _triggerChange: function (attr, how, newVal, oldVal) {
 
-    attr: function (index, value) {
+        // Let the default can.List _triggerChange handle add/remove/length
+        can.List.prototype._triggerChange.apply(this, arguments);
 
-        var items, node;
+        // `batchTrigger` direct add and remove events...
+        var index = +attr;
 
-        // Return a list all the nodes' data
-        if (arguments.length === 0) {
-            items = [];
+        // Make sure this is not nested and not an expando
+        if (!~(""+attr).indexOf('.') && !isNaN(index)) {
 
-            this.each(function (item) {
-
-                // Convert can.Map's/can.List's to objects/arrays
-                if (item instanceof can.Map || item instanceof can.List) {
-                    item = item.attr();
-                }
-
-                items.push(item);
-            });
-
-            return items;
-
-        // Get the data of a node by index
-        } else if (arguments.length === 1) {
-
-            node = this.get(index);
-            return node ? node : undefined;
-
-        // Set the data of a node by index
-        } else if (arguments.length === 2) {
-
-            node = this.set(index, value);
-            return node;
+            // This whole method exists for this IF statement
+            if (how === 'pre-remove') {
+                can.batch.trigger(this, how, [oldVal, index]);
+            }
         }
     }
 
 }));
-
-// Add event utilities
-can.extend(can.TreeList.prototype, can.event);
 
 module.exports = can.TreeList;
 
