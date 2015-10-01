@@ -670,7 +670,7 @@ test('Add/remove 1k items (by indexOf)', function () {
 
     var iterations = 1000;
     var tree = new RBTreeList();
-    var modelList = [];
+    var modelList = []; // TODO: Rename "modelList" to "expected"
     var index, modelIndex, modelRemoved, node, treeIndex, treeRemoved, value,
         operation;
 
@@ -684,16 +684,12 @@ test('Add/remove 1k items (by indexOf)', function () {
             // Alternate push/unshift
             method = (i % 2 === 0 ? 'push' : 'unshift');
             modelList[method](value);
-            node = tree[method](value);
-
-            ok(node instanceof RBTreeList.prototype.Node, 'Returned a Node');
-            equal(node.data, value, 'Returned node has correct data');
+            tree[method](value);
 
             index = tree.indexOf(value);
             modelIndex = modelList.indexOf(value);
 
-            equal(index, modelIndex, 'Evaluated index correctly');
-            equal(tree.length, modelList.length, 'Length is correct');
+            equal(index, modelIndex, 'Value was saved at correct index');
         } else {
             modelIndex = modelList.indexOf(value);
             modelRemoved = modelList.splice(modelIndex, 1);
@@ -706,8 +702,6 @@ test('Add/remove 1k items (by indexOf)', function () {
             treeRemoved.forEach(function (node, i) {
                 equal(node.data, modelRemoved[i], 'Removed item matches model');
             });
-
-            equal(tree.length, modelList.length, 'Length is correct');
         }
 
         equal(tree.length, modelList.length, 'Length is correct');
