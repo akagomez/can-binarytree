@@ -83,7 +83,7 @@ can.TreeList = can.List.extend(can.simpleExtend(treeLibProto, {
     },
 
     // Use our public "get" method internally to get values
-    ___get: function (attr) {
+    __get: function (attr) {
 
         // Don't use the "get" API to read the length (it won't work);
         // Instead read the statically maintained value from the TreeList
