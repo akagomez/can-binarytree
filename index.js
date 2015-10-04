@@ -1,28 +1,27 @@
 var List = require('can/list/list');
-var Construct = require('can/construct/construct');
-var TreeLib = require('./lib/rbtreelist');
+var RBTreeLib = require('./lib/rbtreelist');
 
-// Copy
-var treeLibProto = can.simpleExtend({}, TreeLib.prototype);
+// Copy proto methods
+var rbTreeLibProto = can.simpleExtend({}, RBTreeLib.prototype);
 
 // Save to "can" namespace
-can.TreeList = can.List.extend(can.simpleExtend(treeLibProto, {
+can.RBTreeList = can.List.extend(can.simpleExtend(rbTreeLibProto, {
 
     init: function () {
 
         // Call the original constructor
-        return TreeLib.apply(this, arguments);
+        return RBTreeLib.apply(this, arguments);
     },
 
-    // Save a reference to the TreeLib prototype methods
-    _parent: TreeLib.prototype,
+    // Save a reference to the RBTreeLib prototype methods
+    _parent: RBTreeLib.prototype,
 
     // Trigger a "add" event when length increases
     set: function (index) {
         var lastLength = this.length;
         var insertIndex;
 
-        var node = TreeLib.prototype.set.apply(this, arguments);
+        var node = RBTreeLib.prototype.set.apply(this, arguments);
 
         if (this.length > lastLength) {
             insertIndex = this.indexOfNode(node);
@@ -51,18 +50,18 @@ can.TreeList = can.List.extend(can.simpleExtend(treeLibProto, {
             // to remove a node from the tree
             if (remove) {
 
-                // If another TreeList is bound to this TreeList it needs an
-                // opportunity to reference this TreeList to evaluate
+                // If another RBTreeList is bound to this RBTreeList it needs an
+                // opportunity to reference this RBTreeList to evaluate
                 // "source indexes" before the remove so that it can apply the
                 // same change on its end if necessary
                 // WARNING: This event cannot be batched, which is why we
                 // don't call `can.batch.trigger` or `this._triggerChange`.
-                // If it was the remove would happen before the bound TreeList
+                // If it was the remove would happen before the bound RBTreeList
                 // recieved this event,
                 can.trigger(this, 'pre-remove', [[node], index]);
             }
 
-            TreeLib.prototype.unset.apply(this, arguments);
+            RBTreeLib.prototype.unset.apply(this, arguments);
         }
 
         // Only fire a remove event if the length has changed
@@ -86,7 +85,7 @@ can.TreeList = can.List.extend(can.simpleExtend(treeLibProto, {
     __get: function (attr) {
 
         // Don't use the "get" API to read the length (it won't work);
-        // Instead read the statically maintained value from the TreeList
+        // Instead read the statically maintained value from the RBTreeList
         // NOTE: At this point "length" will already be bound to by __get
         if (attr === 'length') {
             return this.length;
@@ -96,7 +95,7 @@ can.TreeList = can.List.extend(can.simpleExtend(treeLibProto, {
     },
 
     // The default _triggerChange doesn't dispatch the "pre-remove" event
-    // we added for the TreeList, so we handle it here. Unfortunately it's
+    // we added for the RBTreeList, so we handle it here. Unfortunately it's
     // almost entirely a copy/paste job
     _triggerChange: function (attr, how, newVal, oldVal) {
 
@@ -118,5 +117,7 @@ can.TreeList = can.List.extend(can.simpleExtend(treeLibProto, {
 
 }));
 
-module.exports = can.TreeList;
+module.exports = {
+    RBTreeList: can.RBTreeList
+};
 

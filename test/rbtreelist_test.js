@@ -1,7 +1,7 @@
 var QUnit = require("steal-qunit");
-var RBTreeList = window.RBTreeList = require('../index');
+var RBTreeList = require('../index').RBTreeList;
 
-QUnit.module('can-rbtreelist', {
+QUnit.module('can-binarytree', {
     setup: function () {}
 });
 
