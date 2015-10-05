@@ -1,104 +1,111 @@
-Binary Trees [![Build Status](https://secure.travis-ci.org/vadimg/js_bintrees.png?branch=master)](http://travis-ci.org/vadimg/js_bintrees)
-============
+can-binarytree
+===
 
-This package provides Binary and Red-Black Search Trees written in Javascript. It is released under the MIT License.
+This package extends the very well written Javascript binary tree 
+implementations provided by [@vadimg](https://github.com/vadimg/js_bintrees) 
+and and mixes in features of CanJS that make the data structures observable. 
 
-Binary Search Trees are a good way to store data in sorted order. A Red-Black tree is a variation of a Binary Tree that balances itself.
+NOTE: Currently, the only data structure in the package that is observable is 
+the RBTreeList, which was forked from the RBTree for use in
+CanJS' [derive plugin](https://github.com/canjs/can-derive).
 
-Algorithms were taken from Julienne Walker: http://eternallyconfuzzled.com/jsw_home.aspx
+Data Structures
+---
 
-Trees
-------------
+- RBTreeList - A red-black tree implementation that meets the specifications of 
+  a can.List
+- RBTree - A self-balancing binary tree that serves as a key-value store 
+- BinTree - A binary tree that is not balanced
 
-* BinTree - Binary Search Tree
-* RBTree - Red-Black Tree
-
-Quickstart
-------------
-node.js:
-
-```
-npm install bintrees
-```
+Example
+---
 
 ```javascript
-var RBTree = require('bintrees').RBTree;
+var RBTreeList = require('can-binarytree/rbtreelist');
 
-var tree = new RBTree(function(a, b) { return a - b; });
+var tree = new RBTreeList(function (a, b) { return a - b; });
 
-tree.insert(2);
-tree.insert(-3);
+tree.bind('add', function (ev, addedItems) {
+  console.log('Inserted:', addedItems);
+});
+
+tree.bind('remove', function (ev, removedItems) {
+  console.log('Removed:', removedItems);
+});
+
+// Set
+tree.attr(0, 'A'); // "Inserted: [A]"
+tree.attr(2, 'C');  // "Inserted: [C]"
+
+// Get
+tree.attr(0); //-> "A"
+tree.attr(1); //-> undefined
+tree.attr(2); //-> "C"
+
+// Remove value (creates a gap like `delete myArray[index]` would)
+tree.removeNode(0); //-> 'A'
+
+// Serialize
+tree.attr() //-> [undefined, undefined, 'C']
+
+// Get index of value
+tree.indexOf('C') //-> 2
+
+// Remove index (decrements the index of subsequent items by 1)
+tree.removeAttr(1);
+tree.removeAttr(2);
+
+// Get index
+tree.indexOf('C') //-> 0
+
 ```
-
-see examples/node.js for more info
-
-In the browser:
-
-```html
-<script src="/path/to/rbtree.js"></script>
-<script>
-    var tree = new RBTree(function(a, b) { return a - b; });
-    tree.insert(0);
-    tree.insert(1);
-</script>
-```
-
-see examples/client.html for more info
-
-Constructor
-------------
-
-Requires 1 argument: a comparator function f(a,b) which returns:
-* 0 if a == b
-* >0 if a > b
-* <0 if a < b
 
 Methods
-------------
+---
 
-### insert(item)
+#### insert(item)
 > Inserts the item into the tree. Returns true if inserted, false if duplicate.
 
-### remove(item)
+#### remove(item)
 > Removes the item from the tree. Returns true if removed, false if not found.
 
-### size
+#### size
 > Number of nodes in the tree.
 
-### clear()
+#### clear()
 > Removes all nodes from the tree.
 
-### find(item)
+#### find(item)
 > Returns node data if found, null otherwise.
 
-### findIter(item)
+#### findIter(item)
 > Returns an iterator to the node if found, null otherwise.
 
-### lowerBound(item)
+#### lowerBound(item)
 > Returns an interator to the tree node at or immediately after the item. Returns null-iterator if tree is empty.
 >> __NOTE: Changed in version 1.0.0 to match C++ lower_bound__
 
-### upperBound(item)
+#### upperBound(item)
 > Returns an interator to the tree node immediately after the item. Returns null-iterator if tree is empty.
 >> __NOTE: Changed in version 1.0.0 to match C++ upper_bound__
 
-### min()
+#### min()
 > Returns the min node data in the tree, or null if the tree is empty.
 
-### max()
+#### max()
 > Returns the max node data in the tree, or null if the tree is empty.
 
-### each(f)
+#### each(f)
 > Calls f on each node's data, in order.
 
-### reach(f)
+#### reach(f)
 > Calls f on each node's data, in reverse order.
 
-### iterator()
+#### iterator()
 > Returns a null-iterator. See __Iterators__ section below.
 
 Iterators
-------------
+---
 
 tree.iterator() will return a null-iterator. On a null iterator,
 * next() will return the first element in the tree

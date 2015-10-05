@@ -1,15 +1,18 @@
 {
   "author": "Chris Gomez <chris_gomez@bitovi.com>",
   "name": "can-binarytree",
-  "description": "Bindable red-black binary search trees in CanJS",
+  "description": "Observable binary tree data structures for CanJS",
   "version": "1.0.0",
   "keywords": [
-    "binary tree",
+    "black",
+    "binary",
     "canjs",
     "can",
-    "red black tree",
-    "red-black tree",
-    "redblack tree"
+    "list",
+    "red",
+    "red-black",
+    "redblack",
+    "tree"
   ],
   "repository": {
     "type": "git",
