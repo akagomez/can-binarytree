@@ -1,9 +1,7 @@
 var QUnit = require("steal-qunit");
 var RBTreeList = require('../index').RBTreeList;
 
-QUnit.module('can-binarytree', {
-    setup: function () {}
-});
+QUnit.module('can.RBTreeList');
 
 var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 // var alphabet = "ABCDEF".split("");
@@ -623,7 +621,7 @@ test('leftCount is maintained on set and unset', function () {
 });
 
 test('Set/get/unset 10k items (by known index)', function () {
-    var url = 'samples/10k';
+    var url = '../fixtures/10k';
     var req = new XMLHttpRequest();
 
     QUnit.stop();

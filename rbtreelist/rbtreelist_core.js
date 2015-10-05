@@ -1,4 +1,4 @@
-var TreeBase = require('./treebase');
+var TreeBase = require('../treebase/treebase');
 
 var nodeId = 0;
 

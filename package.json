@@ -20,7 +20,7 @@
   },
   "main": "./index.js",
   "scripts": {
-    "test": "testee test/index.html && nodeunit ./test/test_*.js && jshint lib/*.js index.js"
+    "test": "testee test/index.html && jshint lib/*.js index.js"
   },
   "dependencies": {
     "can": "git://github.com/bitovi/canjs.git#minor"
