@@ -82,7 +82,7 @@ can.RBTreeList = can.List.extend(can.simpleExtend(rbTreeCoreProto, {
     },
 
     // Use our public "get" method internally to get values
-    __get: function (attr) {
+    ___get: function (attr) {
 
         // Don't use the "get" API to read the length (it won't work);
         // Instead read the statically maintained value from the RBTreeList
@@ -117,4 +117,4 @@ can.RBTreeList = can.List.extend(can.simpleExtend(rbTreeCoreProto, {
 
 }));
 
-module.exports = can.RBTreeList; 
+module.exports = can.RBTreeList;
