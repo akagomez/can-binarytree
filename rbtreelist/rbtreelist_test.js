@@ -536,6 +536,17 @@ test('"Holey" indexes are not enumerable', function () {
     });
 });
 
+test('Iterable with can.each()', function () {
+    var tree = new RBTreeList();
+    var expected = alphabet.slice();
+
+    // Fill the tree with values
+    tree.splice.apply(tree, [0, 0].concat(alphabet));
+    expected.forEach(function (letter, index) {
+        equal(tree.attr(index).data, letter, 'Value matches');
+    });
+});
+
 test('Remove value by index', function () {
     var tree = new RBTreeList();
     var n;

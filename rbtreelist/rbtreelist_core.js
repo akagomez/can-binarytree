@@ -572,15 +572,16 @@ RBTreeList.prototype._removeNode = function (found, node, remove) {
 };
 
 // Calls cb on each node, in order
-RBTreeList.prototype.each = function (cb) {
+RBTreeList.prototype.each = function (cb, context) {
     var iterator = this.iterator();
 
     while (iterator.next() !== null) {
         var node = iterator.node();
+        // TODO: This would be faster if it was calculated
         var index = this.indexOfNode(node);
 
         // Stop iterating if callback returns false
-        if (cb(node, index) === false) {
+        if (cb.apply(context, [node, index]) === false) {
             break;
         }
     }

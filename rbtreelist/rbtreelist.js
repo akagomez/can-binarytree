@@ -117,4 +117,16 @@ can.RBTreeList = can.List.extend(can.simpleExtend(rbTreeCoreProto, {
 
 }));
 
+// Make RBTreeList instances iterable with `can.each`
+var _each = can.each;
+can.each = function (elements, callback, context) {
+    if (elements instanceof can.RBTreeList) {
+
+        // Iterate using the tree's `each` method
+        return elements.each(callback, context);
+    }
+
+    return _each.apply(this, arguments);
+}
+
 module.exports = can.RBTreeList;
