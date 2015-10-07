@@ -561,6 +561,26 @@ test('Remove value by index', function () {
     }
 });
 
+test('Passing a NaN to .set() will not throw an error', function () {
+    var tree = new RBTreeList();
+    tree.set('foo', 'bar');
+    ok('No error was thrown');
+});
+
+test('Passing a NaN to set/get/or unset will not throw an error', function () {
+    var tree = new RBTreeList();
+
+    tree.set('foo', 'bar');
+    tree.get('boo');
+    tree.unset('goo');
+
+    ok(true, 'No error was thrown');
+    equal(tree.attr('length'), 0, 'Length is zero');
+    equal(tree._root, null, 'The list contains no items');
+});
+
+
+
 test('leftCount is maintained on set and unset', function () {
 
     var recursiveChildCountTest = function (node, isChild) {

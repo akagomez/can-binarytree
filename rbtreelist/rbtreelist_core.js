@@ -2,6 +2,15 @@ var TreeBase = require('../treebase/treebase');
 
 var nodeId = 0;
 
+// Identify if a value is a number that is whole
+// (equally divisible by 1) and positive
+var isWholePositiveNumber = function (value) {
+    return (! isNaN(value) && // Isn't a NaN
+        typeof value === 'number' && // Is a number
+        value >= 0 && // Is greater than or equal to 0
+        value / 1 === value); // Is whole
+};
+
 function Node (data, isHead) {
     this.id = nodeId++;
     this.parent = null;
@@ -110,6 +119,11 @@ RBTreeList.prototype.get = function (searchIndex) {
     var index, c;
 
     searchIndex = +searchIndex;
+
+    // A positive whole number is required to "get"
+    if (! isWholePositiveNumber(searchIndex)) {
+        return null;
+    }
 
     while (node !== null) {
 
@@ -299,8 +313,11 @@ RBTreeList.prototype.set = function (setIndex, data, splice) {
     var node;
     var found = false;
 
-    // Don't allow negative values
-    if (setIndex < 0) {
+    // Cast as number
+    setIndex = +setIndex;
+
+    // A positive whole number is required to "set"
+    if (! isWholePositiveNumber(setIndex)) {
         return null;
     }
 
@@ -427,7 +444,7 @@ RBTreeList.prototype.set = function (setIndex, data, splice) {
 };
 
 // Returns index of removal, -1 if not found
-RBTreeList.prototype.unset = function(unsetIndex, remove) {
+RBTreeList.prototype.unset = function (unsetIndex, remove) {
     if (this._root === null) {
         return -1;
     }
@@ -441,6 +458,14 @@ RBTreeList.prototype.unset = function(unsetIndex, remove) {
     var found = null; // Found item
     var dir = 1;
     var index = -1;
+
+    // Cast as number
+    unsetIndex = +unsetIndex;
+
+    // A positive whole number is required to "unset"
+    if (! isWholePositiveNumber(unsetIndex)) {
+        return null;
+    }
 
     while (node.getChild(dir) !== null) {
         var lastDir = dir;
