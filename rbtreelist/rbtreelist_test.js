@@ -1,5 +1,5 @@
 var QUnit = require("steal-qunit");
-var RBTreeList = require('../index').RBTreeList;
+var RBTreeList = require('rbtreelist/rbtreelist');
 
 QUnit.module('can.RBTreeList');
 
@@ -274,7 +274,7 @@ test('Remove an item via .unset()', function () {
 
     for (var i = alphabet.length - 1; i >= 0; i--) {
         tree.unset(i, true);
-    };
+    }
 
     tree.each(function () {
         ok(false, 'There should be nothing to iterate');
@@ -700,10 +700,10 @@ test('Add/remove 1k items (by indexOf)', function () {
     var iterations = 1000;
     var tree = new RBTreeList();
     var modelList = []; // TODO: Rename "modelList" to "expected"
-    var index, modelIndex, modelRemoved, node, treeIndex, treeRemoved, value,
-        operation;
+    var i, j, index, modelIndex, modelRemoved, node, treeIndex, treeRemoved,
+        value, operation;
 
-    for (var i = 0; i < iterations * 2; i++) {
+    for (i = 0; i < iterations * 2; i++) {
 
         // Generate a logical unique value (hex)
         value = parseInt(i, 16);
@@ -728,9 +728,9 @@ test('Add/remove 1k items (by indexOf)', function () {
 
             equal(treeIndex, modelIndex, 'Indices match');
 
-            treeRemoved.forEach(function (node, i) {
-                equal(node.data, modelRemoved[i], 'Removed item matches model');
-            });
+            for (j = 0; j <  modelRemoved.length; j++) {
+                equal(treeRemoved[j].data, modelRemoved[j], 'Removed item matches model');
+            }
         }
 
         equal(tree.length, modelList.length, 'Length is correct');

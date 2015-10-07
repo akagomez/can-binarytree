@@ -91,7 +91,7 @@ can.RBTreeList = can.List.extend(can.simpleExtend(rbTreeCoreProto, {
             return this.length;
         }
 
-        return this.get.apply(this, arguments)
+        return this.get.apply(this, arguments);
     },
 
     // The default _triggerChange doesn't dispatch the "pre-remove" event
@@ -127,6 +127,6 @@ can.each = function (elements, callback, context) {
     }
 
     return _each.apply(this, arguments);
-}
+};
 
 module.exports = can.RBTreeList;
