@@ -1,6 +1,6 @@
 {
   "name": "can-binarytree",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Observable binary tree data structures for CanJS",
   "main": "can-binarytree.js",
   "author": "Chris Gomez <akagomez@gmail.com>",
