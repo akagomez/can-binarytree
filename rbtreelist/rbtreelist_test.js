@@ -28,6 +28,33 @@ test('Set value by index (natural order)', function () {
     });
 });
 
+test('Passing an array to the constructor builds a tree as a batch', function () {
+    // var values = alphabet.slice();
+    var values = [];
+    for (var i = 0; i < 1000; i++) {
+        values[i] = i.toString(16);
+    }
+
+    var _set = RBTreeList.prototype.set;
+
+    // RBTreeList.prototype.set = function () {
+    //     ok(false, '.set() should not be called');
+    // }
+
+    var probe = +new Date();
+    var tree = new RBTreeList(values);
+    // var tree = new RBTreeList(); tree.push.apply(tree, values);
+
+    // RBTreeList.prototype.set = _set;
+
+    ok(true, '.set() was not called');
+    equal(tree.attr('length'), values.length, 'Tree has the correct length');
+
+    values.forEach(function (value, index) {
+        equal(tree.get(index).data, value, 'Tree has the correct value at the correct index');
+    });
+});
+
 test('Add node with .push()', function () {
     var tree = new RBTreeList();
 

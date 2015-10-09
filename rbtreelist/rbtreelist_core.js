@@ -86,10 +86,11 @@ Node.prototype.setSibling = function (dir, node, splice) {
 };
 
 
-function RBTreeList(comparator) {
+function RBTreeList (initialItems, setCallback) {
     this._root = null;
     this.length = 0;
     this._indexOfNodeCache = {};
+    this.batchSet.apply(this, arguments);
 }
 
 RBTreeList.prototype = new TreeBase();
@@ -261,6 +262,59 @@ RBTreeList.prototype.values = function () {
     return outputArray;
 };
 
+RBTreeList.prototype.batchSet = function (values, setCallback) {
+    var length = values && values.length;
+
+    if (typeof length === 'undefined' || length <= 0
+        || typeof values.slice === 'undefined') {
+        return;
+    }
+
+    var recursivelySet = function (parentNode, dir, lowerIndex, upperIndex) {
+
+        // Find the center index of this range
+        // NOTE: +1 to account for the value AT upperIndex
+        var numberOfValues = upperIndex - lowerIndex + 1;
+        var centerIndex = lowerIndex + Math.floor(numberOfValues / 2);
+
+        // Get the value at that index
+        var value = values[centerIndex];
+
+        // Create the Node
+        var childNode = new Node(value);
+
+        // Save the value to the parentNode
+        parentNode.setSibling(dir, childNode);
+        parentNode.setChild(dir, childNode);
+        this._indexOfNodeCache = {};
+        this._gapAndSize(centerIndex, childNode);
+        this._indexOfNodeCache = {};
+
+        // Do something with the created node
+        if (setCallback) {
+            setCallback(centerIndex, childNode);
+        }
+
+        var nextLeftUpper = centerIndex - 1;
+        var nextRightLower = centerIndex + 1;
+
+        if (nextLeftUpper >= lowerIndex) {
+            recursivelySet.call(this, childNode, false, lowerIndex, nextLeftUpper);
+        }
+
+        if (nextRightLower <= upperIndex) {
+            recursivelySet.call(this, childNode, true, nextRightLower, upperIndex);
+        }
+
+    }
+
+    var head = new Node(undefined, true);
+    recursivelySet.call(this, head, true, 0, length - 1);
+    this._root = head.getChild(1);
+
+    return this;
+};
+
 RBTreeList.prototype._gapAndSize = function (setIndex, insertedNode, splice) {
 
     // Get the last node in the tree, then get its index
@@ -272,6 +326,7 @@ RBTreeList.prototype._gapAndSize = function (setIndex, insertedNode, splice) {
     // this, but length is unreliable; Consider this example:
     //     var a = []; a[100] = 'foo'; a.length //-> 101
     //     a.splice(100, 1); a.length //-> 100
+    // In this case there would be no Nodes to represent this gap
     if (this.last() === insertedNode) {
         if (! insertedNode.prev) {
             // There is no last node; The setIndex is the gap

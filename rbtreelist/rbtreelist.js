@@ -7,6 +7,14 @@ var rbTreeCoreProto = can.simpleExtend({}, RBTreeCore.prototype);
 
 RBTreeList = can.List.extend(can.simpleExtend(rbTreeCoreProto, {
 
+    setup: function (instances, options) {
+
+        // Call the default can.List setup method without the instances
+        var setupResult = List.prototype.setup.call(this, undefined, options);
+
+        return setupResult;
+    },
+
     init: function () {
 
         // Call the original constructor
