@@ -84,14 +84,18 @@ RBTreeList = can.List.extend(can.simpleExtend(rbTreeCoreProto, {
     // Use our public "get" method internally to get values
     ___get: function (attr) {
 
-        // Don't use the "get" API to read the length (it won't work);
-        // Instead read the statically maintained value from the RBTreeList
-        // NOTE: At this point "length" will already be bound to by __get
-        if (attr === 'length') {
-            return this.length;
+        if (attr) {
+            // Don't use the "get" API to read the length (it won't work);
+            // Instead read the statically maintained value from the RBTreeList
+            // NOTE: At this point "length" will already be bound to by __get
+            if (attr === 'length') {
+                return this.length;
+            }
+
+            return this.get.apply(this, arguments);
         }
 
-        return this.get.apply(this, arguments);
+        return this._getAttrs();
     }
 
 }));
