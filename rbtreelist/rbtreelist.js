@@ -92,27 +92,6 @@ RBTreeList = can.List.extend(can.simpleExtend(rbTreeCoreProto, {
         }
 
         return this.get.apply(this, arguments);
-    },
-
-    // The default _triggerChange doesn't dispatch the "pre-remove" event
-    // we added for the RBTreeList, so we handle it here. Unfortunately it's
-    // almost entirely a copy/paste job
-    _triggerChange: function (attr, how, newVal, oldVal) {
-
-        // Let the default can.List _triggerChange handle add/remove/length
-        can.List.prototype._triggerChange.apply(this, arguments);
-
-        // `batchTrigger` direct add and remove events...
-        var index = +attr;
-
-        // Make sure this is not nested and not an expando
-        if (!~(""+attr).indexOf('.') && !isNaN(index)) {
-
-            // This whole method exists for this IF statement
-            if (how === 'pre-remove') {
-                can.batch.trigger(this, how, [oldVal, index]);
-            }
-        }
     }
 
 }));
