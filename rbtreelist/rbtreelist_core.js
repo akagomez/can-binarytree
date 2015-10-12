@@ -264,6 +264,7 @@ RBTreeList.prototype.values = function () {
 
 RBTreeList.prototype.batchSet = function (values, setCallback) {
     var length = values && values.length;
+    var head;
 
     if (typeof length === 'undefined' || length <= 0
         || typeof values.slice === 'undefined') {
@@ -276,6 +277,9 @@ RBTreeList.prototype.batchSet = function (values, setCallback) {
         // NOTE: +1 to account for the value AT upperIndex
         var numberOfValues = upperIndex - lowerIndex + 1;
         var centerIndex = lowerIndex + Math.floor(numberOfValues / 2);
+        var leftBlackHeight = rightBlackHeight = 0;
+        var nextLeftUpper, nextRightLower, leftSibling, rightSibling,
+            totalBlackHeight, recoloredSibling;
 
         // Get the value at that index
         var value = values[centerIndex];
@@ -295,20 +299,80 @@ RBTreeList.prototype.batchSet = function (values, setCallback) {
             setCallback(centerIndex, childNode);
         }
 
-        var nextLeftUpper = centerIndex - 1;
-        var nextRightLower = centerIndex + 1;
+        // Redefine the bounds
+        nextLeftUpper = centerIndex - 1;
+        nextRightLower = centerIndex + 1;
 
         if (nextLeftUpper >= lowerIndex) {
-            recursivelySet.call(this, childNode, false, lowerIndex, nextLeftUpper);
+            leftBlackHeight =
+                recursivelySet.call(this, childNode, false, lowerIndex, nextLeftUpper);
         }
 
         if (nextRightLower <= upperIndex) {
-            recursivelySet.call(this, childNode, true, nextRightLower, upperIndex);
+            rightBlackHeight =
+                recursivelySet.call(this, childNode, true, nextRightLower, upperIndex);
         }
 
+        // Save a reference to each sibling
+        leftSibling = childNode.getChild(false);
+        rightSibling = childNode.getChild(true);
+
+        // Balance the black-height
+        // NOTE: This operation can be pretty naive because
+        // we know the  tree is balanced
+        if (leftBlackHeight < rightBlackHeight) {
+            leftSibling.red = false;
+            leftBlackHeight++;
+        } else if (rightBlackHeight < leftBlackHeight) {
+            rightSibling.red = false;
+            rightBlackHeight++;
+        }
+
+        if (leftBlackHeight !== rightBlackHeight) {
+            throw new Error('The black-height constraint is not met');
+        }
+
+        // If this is the root node, make it BLACK
+        if (childNode === head.getChild(true)) {
+            childNode.red = false;
+
+        // If this node has no children, make it RED
+        } else if (! leftSibling && ! rightSibling) {
+            childNode.red = true;
+
+        // If this node has at least one child...
+        } else if (leftSibling || rightSibling) {
+
+            // AND one of those two children is BLACK, make it RED
+            if ((leftSibling && ! leftSibling.red) ||
+                    (rightSibling && ! rightSibling.red)) {
+                childNode.red = true;
+
+            // OTHERWISE make it BLACK
+            } else {
+                childNode.red = false;
+            }
+
+        // If this node has two children...
+        } else if (leftSibling && rightSibling) {
+
+            // AND both of those two children are BLACK, make it RED
+            if (! leftSibling.red && ! rightSibling.red) {
+                childNode.red = true;
+
+            // OTHERWISE make it BLACK
+            } else {
+                childNode.red = false;
+            }
+
+        }
+
+        // Add one to the black-height if this node is also black
+        // NOTE: We assume: leftBlackHeight === rightBlackHeight
+        return leftBlackHeight + (! childNode.red ? 1 : 0);
     }
 
-    var head = new Node(undefined, true);
+    head = new Node(undefined, true);
     recursivelySet.call(this, head, true, 0, length - 1);
     this._root = head.getChild(1);
 
@@ -730,7 +794,7 @@ RBTreeList.prototype.printIndexes = function (debug, startIndex, count) {
     this.print(function (node) {
         var index = this.indexOfNode(node);
         var value = this._printIndexesValue(node);
-        var out =  index;
+        var out = index;
 
         if (debug !== false) {
             out += '(' + node.leftCount + '|' +
@@ -743,10 +807,15 @@ RBTreeList.prototype.printIndexes = function (debug, startIndex, count) {
     }, startIndex, count);
 };
 
-RBTreeList.prototype._printIndexesValue = function (node) {
-    var value = (node.data === undefined ? '_' : node.data);
-    value = (typeof value === 'object' ? '{id:'+ node.id + '}' : value);
-    return value;
+RBTreeList.prototype.printColors = function (startIndex, count) {
+    this.print(function (node) {
+        var index = this.indexOfNode(node);
+        var out = index;
+
+        out += '(' + (node.red ? 'R' : 'B') + ')';
+
+        return out;
+    }, startIndex, count);
 };
 
 RBTreeList.prototype.printLinks = function () {
@@ -759,6 +828,12 @@ RBTreeList.prototype.printLinks = function () {
         out +=  left + ' < ' + node.data + ' > ' + right + '\n';
     });
     console.log(out);
+};
+
+RBTreeList.prototype._printIndexesValue = function (node) {
+    var value = (node.data === undefined ? '_' : node.data);
+    value = (typeof value === 'object' ? '{id:'+ node.id + '}' : value);
+    return value;
 };
 
 module.exports = RBTreeList;
