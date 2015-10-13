@@ -222,20 +222,36 @@ RBTreeList.prototype.indexOf = function (value) {
     return index;
 };
 
-RBTreeList.prototype.indexOfNode = function (node) {
+RBTreeList.prototype._emptyIndexOfNodeCache = function () {
+    // NOTE: This is faster than emptying the map with `delete`, but bad
+    // for GC. To compensate we should call this method as infrequently as
+    // possible. Also, internally we don't use the cache when calling
+    // `indexOfNode` so that we don't have to empty the cache before/after
+    // altering it.
+    this._indexOfNodeCache = {};
+}
+
+RBTreeList.prototype.indexOfNode = function (node, useCache) {
     if (! node) {
         return -1;
     }
 
-    var parentNode = node.parent;
-    var index = this._indexOfNodeCache[node.id];
+    // Default `useCache` to true
+    useCache = typeof useCache !== 'undefined' ? useCache : true;
 
-    if (index !== undefined) {
-        return index;
+    var parentNode = node.parent;
+    var index;
+
+    if (useCache) {
+        index = this._indexOfNodeCache[node.id];
+
+        if (index !== undefined) {
+            return index;
+        }
     }
 
     if (parentNode && ! parentNode.isHead) {
-        index = this.indexOfNode(parentNode, index);
+        index = this.indexOfNode(parentNode, useCache);
 
         if (parentNode.left === node) {
             index -= node.rightCount + parentNode.leftGapCount + 1;
@@ -247,7 +263,9 @@ RBTreeList.prototype.indexOfNode = function (node) {
     }
 
     // Cache
-    this._indexOfNodeCache[node.id] = index;
+    if (useCache) {
+        this._indexOfNodeCache[node.id] = index;
+    }
 
     return index;
 };
@@ -287,9 +305,8 @@ RBTreeList.prototype.batchSet = function (values, setCallback) {
 
         // Add the node to the tree
         parentNode.setChild(dir, childNode);
-        this._indexOfNodeCache = {};
+
         this._gapAndSize(centerIndex, childNode);
-        this._indexOfNodeCache = {};
 
         // Do something with the created node
         if (setCallback) {
@@ -390,7 +407,7 @@ RBTreeList.prototype.batchSet = function (values, setCallback) {
 RBTreeList.prototype._gapAndSize = function (setIndex, insertedNode, splice) {
 
     // Get the last node in the tree, then get its index
-    var lastNodeIndex = this.indexOfNode(this.last());
+    var lastNodeIndex = this.indexOfNode(this.last(), false);
 
     // If the setIndex is greater than the last node's index, use it's index
     // to determine the gap length
@@ -405,13 +422,14 @@ RBTreeList.prototype._gapAndSize = function (setIndex, insertedNode, splice) {
             insertedNode.leftGapCount = setIndex;
         } else {
             // Don't include the last node in the length of this node's gap
-            insertedNode.leftGapCount = setIndex - this.indexOfNode(insertedNode.prev) - 1;
+            insertedNode.leftGapCount =
+                setIndex - this.indexOfNode(insertedNode.prev, false) - 1;
         }
     } else if (insertedNode.next) {
         var nextNode = insertedNode.next;
         // Minus 1 to offset the gapless `insertedNode` that's already in the
         // tree
-        var nodeIndex = this.indexOfNode(nextNode) - 1;
+        var nodeIndex = this.indexOfNode(nextNode, false) - 1;
         var gapStart = nodeIndex - nextNode.leftGapCount;
 
         if (setIndex >= gapStart && setIndex < nodeIndex) {
@@ -452,9 +470,7 @@ RBTreeList.prototype.set = function (setIndex, data, splice) {
         // Empty tree
         node = new Node(data);
         this._root = node;
-        this._indexOfNodeCache = {};
         this._gapAndSize(setIndex, node, splice);
-        this._indexOfNodeCache = {};
         inserted = true;
     } else {
 
@@ -484,9 +500,7 @@ RBTreeList.prototype.set = function (setIndex, data, splice) {
                 p.setChild(dir, node, true);
 
                 // Use `next`/`prev` links to calculate `leftGapCount`
-                this._indexOfNodeCache = {};
                 this._gapAndSize(setIndex, node, splice);
-                this._indexOfNodeCache = {};
 
                 inserted = true;
             } else if (this._isRed(node.left) && this._isRed(node.right)) {
@@ -567,6 +581,11 @@ RBTreeList.prototype.set = function (setIndex, data, splice) {
     this._root.red = false;
     this._root.parent = null;
 
+    // Empty the cache if the set altered the tree
+    if (inserted) {
+        this._emptyIndexOfNodeCache();
+    }
+
     return node;
 };
 
@@ -584,7 +603,6 @@ RBTreeList.prototype.unset = function (unsetIndex, remove) {
     var p = null; // Parent
     var found = null; // Found item
     var dir = 1;
-    var index = -1;
 
     // Cast as number
     unsetIndex = +unsetIndex;
@@ -649,9 +667,7 @@ RBTreeList.prototype.unset = function (unsetIndex, remove) {
     // Replace the found node with its previous sibling
     if (found !== null) {
         this._removeNode(found, node, remove);
-        this._indexOfNodeCache = {};
-    } else {
-        index = -1;
+        this._emptyIndexOfNodeCache();
     }
 
     // Update root and make it black
