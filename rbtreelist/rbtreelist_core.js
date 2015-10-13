@@ -264,7 +264,8 @@ RBTreeList.prototype.values = function () {
 
 RBTreeList.prototype.batchSet = function (values, setCallback) {
     var length = values && values.length;
-    var head;
+    var nodes = [];
+    var head, i;
 
     if (typeof length === 'undefined' || length <= 0
         || typeof values.slice === 'undefined') {
@@ -278,17 +279,13 @@ RBTreeList.prototype.batchSet = function (values, setCallback) {
         var numberOfValues = upperIndex - lowerIndex + 1;
         var centerIndex = lowerIndex + Math.floor(numberOfValues / 2);
         var leftBlackHeight = rightBlackHeight = 0;
-        var nextLeftUpper, nextRightLower, leftSibling, rightSibling,
-            totalBlackHeight, recoloredSibling;
+        var childNode, nextLeftUpper, nextRightLower, leftSibling,
+            rightSibling, totalBlackHeight;
 
-        // Get the value at that index
-        var value = values[centerIndex];
+        // Get the prepared/linked node
+        childNode = nodes[centerIndex];
 
-        // Create the Node
-        var childNode = new Node(value);
-
-        // Save the value to the parentNode
-        parentNode.setSibling(dir, childNode);
+        // Add the node to the tree
         parentNode.setChild(dir, childNode);
         this._indexOfNodeCache = {};
         this._gapAndSize(centerIndex, childNode);
@@ -370,6 +367,17 @@ RBTreeList.prototype.batchSet = function (values, setCallback) {
         // Add one to the black-height if this node is also black
         // NOTE: We assume: leftBlackHeight === rightBlackHeight
         return leftBlackHeight + (! childNode.red ? 1 : 0);
+    }
+
+    // Prepare all the nodes
+    for (i = 0; i < values.length; i++) {
+        nodes.push(new Node(values[i]));
+
+        // Link the nodes together now while it's easy because they're
+        // all in order
+        if (nodes[i - 1]) {
+            nodes[i - 1].setSibling(true, nodes[i], true);
+        }
     }
 
     head = new Node(undefined, true);
