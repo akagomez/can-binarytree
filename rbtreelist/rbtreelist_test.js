@@ -1,6 +1,8 @@
 var QUnit = require("steal-qunit");
 var RBTreeList = require('rbtreelist/rbtreelist');
 
+require('can/compute/compute');
+
 QUnit.module('can.RBTreeList');
 
 var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
@@ -770,4 +772,29 @@ test('Get value at index using attr()', function () {
     equal(collection.attr(0), 'a', 'Got value using .attr()');
     equal(collection.attr(1), 'b', 'Got value using .attr()');
     equal(collection.attr(2), 'c', 'Got value using .attr()');
+});
+
+test('Calling .each in a compute will bind to length', function () {
+    var source = new RBTreeList(['a', 'b', 'c']);
+    var cloneCompute = can.compute(function () {
+        var result = [];
+
+        source.each(function (item) {
+            result.push(item.data);
+        });
+
+        return result;
+    });
+
+    cloneCompute.bind('change', can.noop);
+
+    var clone = cloneCompute();
+    equal(clone[0], 'a', 'Cloned index matches source index');
+    equal(clone[1], 'b', 'Cloned index matches source index');
+    equal(clone[2], 'c', 'Cloned index matches source index');
+
+    source.push('d');
+
+    clone = cloneCompute();
+    equal(clone[3], 'd', 'Cloned index matches source index');
 });

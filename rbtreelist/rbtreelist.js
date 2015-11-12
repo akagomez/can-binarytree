@@ -1,5 +1,8 @@
 var List = require('can/list/list');
 var RBTreeCore = require('./rbtreelist_core');
+
+require('can/util/util');
+
 var RBTreeList;
 
 // Copy proto methods
@@ -87,6 +90,14 @@ RBTreeList = can.List.extend(can.simpleExtend(rbTreeCoreProto, {
         }
 
         return node;
+    },
+
+    each: function () {
+
+        // Bind to length for computes
+        this.attr('length');
+
+        return RBTreeCore.prototype.each.apply(this, arguments);
     },
 
     // Prevent calling can.List.prototype.__set becuase it attempts to handle
