@@ -21,7 +21,7 @@
     "url": "git://github.com/akagomez/can-binarytree.git"
   },
   "dependencies": {
-    "can": "git://github.com/bitovi/canjs.git#2.2.9"
+    "can": "git://github.com/bitovi/canjs.git#v2.2.9"
   },
   "devDependencies": {
     "jshint": "^2.7.0",
