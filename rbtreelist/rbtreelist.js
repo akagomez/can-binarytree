@@ -12,6 +12,15 @@ RBTreeList = can.List.extend(can.simpleExtend(rbTreeCoreProto, {
         // Call the default can.List setup method without the instances
         var setupResult = List.prototype.setup.call(this, undefined, options);
 
+        // CanJS 3.0
+        if (this.___get) {
+            this.___get = this.____get;
+
+        // CanJS 2.2.9
+        } else {
+            this.__get = this.____get;
+        }
+
         return setupResult;
     },
 
@@ -89,8 +98,8 @@ RBTreeList = can.List.extend(can.simpleExtend(rbTreeCoreProto, {
         return this.set.apply(this, arguments);
     },
 
-    // Use our public "get" method internally to get values
-    ___get: function (attr) {
+    ____get: function (attr) {
+        var node;
 
         if (attr) {
             // Don't use the "get" API to read the length (it won't work);
@@ -100,7 +109,9 @@ RBTreeList = can.List.extend(can.simpleExtend(rbTreeCoreProto, {
                 return this.length;
             }
 
-            return this.get.apply(this, arguments);
+            node = this.get.apply(this, arguments);
+
+            return node && node.data;
         }
 
         return this._getAttrs();

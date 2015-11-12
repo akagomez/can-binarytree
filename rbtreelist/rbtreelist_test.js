@@ -570,7 +570,7 @@ test('Iterable with can.each()', function () {
     // Fill the tree with values
     tree.splice.apply(tree, [0, 0].concat(alphabet));
     expected.forEach(function (letter, index) {
-        equal(tree.attr(index).data, letter, 'Value matches');
+        equal(tree.attr(index), letter, 'Value matches');
     });
 });
 
@@ -763,4 +763,11 @@ test('Add/remove 1k items (by indexOf)', function () {
         equal(tree.length, modelList.length, 'Length is correct');
     }
 
+});
+
+test('Get value at index using attr()', function () {
+    var collection = new RBTreeList(['a', 'b', 'c']);
+    equal(collection.attr(0), 'a', 'Got value using .attr()');
+    equal(collection.attr(1), 'b', 'Got value using .attr()');
+    equal(collection.attr(2), 'c', 'Got value using .attr()');
 });
