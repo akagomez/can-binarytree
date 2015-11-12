@@ -62,7 +62,7 @@ Node.prototype.updateChildCount = function () {
         this.left.rightCount + 1;
 
     // Update all parents' child count recursively
-    if (this.parent) {
+    if (this.parent && this.parent !== this) {
         this.parent.updateChildCount();
     }
 };
