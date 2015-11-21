@@ -60,7 +60,6 @@ RBTreeList = can.List.extend(can.simpleExtend(rbTreeCoreProto, {
         // Unset or remove
         var node = this.get(index);
 
-
         if (node) {
             // Get the actual index not taking into consideration the
             // consideration the comparator

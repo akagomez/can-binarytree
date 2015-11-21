@@ -30,9 +30,30 @@ Node.prototype.getChild = function (dir) {
     return dir ? this.right : this.left;
 };
 
+Node.prototype.debugCircularParents = function (encountered) {
+    if (! encountered) {
+        encountered = {};
+    }
+
+    if (encountered[this.id]) {
+        throw new Error('A node cannot be a parent of itself');
+    } else {
+        encountered[this.id] = true;
+    }
+
+    if (this.parent) {
+        this.parent.debugCircularParents(encountered);
+    }
+};
+
+
 Node.prototype.setChild = function (dir, node) {
 
     var link = dir ? 'right' : 'left';
+
+    if (node === this) {
+        throw new Error('A node cannot be a child of itself');
+    }
 
     // If the current old link references this node as the parent,
     // break the link
@@ -70,6 +91,7 @@ Node.prototype.updateChildCount = function () {
 Node.prototype.setSibling = function (dir, node, splice) {
     var link = dir ? 'next' : 'prev';
     var backLink = dir ? 'prev' : 'next';
+    var saved;
 
     if (! this.isHead && node) {
         saved = this[link];
@@ -98,8 +120,8 @@ RBTreeList.prototype = new TreeBase();
 RBTreeList.prototype.Node = Node;
 
 RBTreeList.prototype._comparator = function (a, b) {
-    a = a instanceof this.Node ? this.indexOfNode(a) : a;
-    b = b instanceof this.Node ? this.indexOfNode(b) : b;
+    a = a instanceof this.Node ? this.indexOfNode(a, false) : a;
+    b = b instanceof this.Node ? this.indexOfNode(b, false) : b;
     return a === b ? 0 : a < b ? -1 : 1; // ASC
 };
 
@@ -117,7 +139,7 @@ RBTreeList.prototype.insert = function () {
 RBTreeList.prototype.get = function (searchIndex) {
     var node = this._root;
     var dir = true; // Add leftCount initially
-    var index, c;
+    var c;
 
     searchIndex = +searchIndex;
 
@@ -168,7 +190,7 @@ RBTreeList.prototype.push = function () {
 RBTreeList.prototype.splice = function (startIndex, deleteCount) {
     var removed = [];
     var listLength = this.length;
-    var i, node, value;
+    var i, node;
 
     startIndex = parseInt(startIndex, 10);
     deleteCount = parseInt(deleteCount, 10);
@@ -229,7 +251,7 @@ RBTreeList.prototype._emptyIndexOfNodeCache = function () {
     // `indexOfNode` so that we don't have to empty the cache before/after
     // altering it.
     this._indexOfNodeCache = {};
-}
+};
 
 RBTreeList.prototype.indexOfNode = function (node, useCache) {
     if (! node) {
@@ -283,7 +305,7 @@ RBTreeList.prototype.values = function () {
 RBTreeList.prototype.batchSet = function (values, setCallback) {
     var length = values && values.length;
     var nodes = [];
-    var head, i;
+    var head, root, i;
 
     if (typeof length === 'undefined' || length <= 0
         || typeof values.slice === 'undefined') {
@@ -296,9 +318,10 @@ RBTreeList.prototype.batchSet = function (values, setCallback) {
         // NOTE: +1 to account for the value AT upperIndex
         var numberOfValues = upperIndex - lowerIndex + 1;
         var centerIndex = lowerIndex + Math.floor(numberOfValues / 2);
-        var leftBlackHeight = rightBlackHeight = 0;
+        var leftBlackHeight = 0;
+        var rightBlackHeight = 0;
         var childNode, nextLeftUpper, nextRightLower, leftSibling,
-            rightSibling, totalBlackHeight;
+            rightSibling;
 
         // Get the prepared/linked node
         childNode = nodes[centerIndex];
@@ -384,7 +407,7 @@ RBTreeList.prototype.batchSet = function (values, setCallback) {
         // Add one to the black-height if this node is also black
         // NOTE: We assume: leftBlackHeight === rightBlackHeight
         return leftBlackHeight + (! childNode.red ? 1 : 0);
-    }
+    };
 
     // Prepare all the nodes
     for (i = 0; i < values.length; i++) {
@@ -399,15 +422,14 @@ RBTreeList.prototype.batchSet = function (values, setCallback) {
 
     head = new Node(undefined, true);
     recursivelySet.call(this, head, true, 0, length - 1);
-    this._root = head.getChild(1);
+    root = head.getChild(1);
+    root.parent = undefined;
+    this._root = root;
 
     return this;
 };
 
 RBTreeList.prototype._gapAndSize = function (setIndex, insertedNode, splice) {
-
-    // Get the last node in the tree, then get its index
-    var lastNodeIndex = this.indexOfNode(this.last(), false);
 
     // If the setIndex is greater than the last node's index, use it's index
     // to determine the gap length
@@ -453,7 +475,6 @@ RBTreeList.prototype._gapAndSize = function (setIndex, insertedNode, splice) {
 
 // Return index of insertion, -1 if duplicate
 RBTreeList.prototype.set = function (setIndex, data, splice) {
-    var index;
     var inserted = false;
     var node;
     var found = false;
@@ -550,8 +571,6 @@ RBTreeList.prototype.set = function (setIndex, data, splice) {
                     cmp = 1;
 
                 // Step #2: Go right, repeat
-                } else {
-                    cmp = -1;
                 }
             }
 
@@ -638,7 +657,8 @@ RBTreeList.prototype.unset = function (unsetIndex, remove) {
             } else if (!this._isRed(node.getChild(!dir))) {
                 var sibling = p.getChild(!lastDir);
                 if (sibling !== null) {
-                    if (!this._isRed(sibling.getChild(!lastDir)) && !this._isRed(sibling.getChild(lastDir))) {
+                    if (!this._isRed(sibling.getChild(!lastDir)) &&
+                            !this._isRed(sibling.getChild(lastDir))) {
                         // Color flip
                         p.red = false;
                         sibling.red = true;
@@ -838,6 +858,13 @@ RBTreeList.prototype.printColors = function (startIndex, count) {
 
         out += '(' + (node.red ? 'R' : 'B') + ')';
 
+        return out;
+    }, startIndex, count);
+};
+
+RBTreeList.prototype.printParents = function (startIndex, count) {
+    this.print(function (node) {
+        var out = '(' + node.id + '^' + (node.parent ? node.parent.id : '_') + ')';
         return out;
     }, startIndex, count);
 };

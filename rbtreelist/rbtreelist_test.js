@@ -31,7 +31,6 @@ test('Set value by index (natural order)', function () {
 });
 
 test('Passing an array to the constructor builds a tree as a batch', function () {
-    // var values = alphabet.slice();
     var values = [];
     for (var i = 0; i < 1000; i++) {
         values[i] = i.toString(16);
@@ -39,15 +38,13 @@ test('Passing an array to the constructor builds a tree as a batch', function ()
 
     var _set = RBTreeList.prototype.set;
 
-    // RBTreeList.prototype.set = function () {
-    //     ok(false, '.set() should not be called');
-    // }
+    RBTreeList.prototype.set = function () {
+        ok(false, '.set() should not be called');
+    };
 
-    var probe = +new Date();
     var tree = new RBTreeList(values);
-    // var tree = new RBTreeList(); tree.push.apply(tree, values);
 
-    // RBTreeList.prototype.set = _set;
+    RBTreeList.prototype.set = _set;
 
     ok(true, '.set() was not called');
     equal(tree.attr('length'), values.length, 'Tree has the correct length');
@@ -720,7 +717,7 @@ test('Set/get/unset 10k items (by known index)', function () {
         });
     });
 
-    req.open("get", url, true);
+    req.open('get', url, true);
     req.send();
 });
 
@@ -729,8 +726,8 @@ test('Add/remove 1k items (by indexOf)', function () {
     var iterations = 1000;
     var tree = new RBTreeList();
     var modelList = []; // TODO: Rename "modelList" to "expected"
-    var i, j, index, modelIndex, modelRemoved, node, treeIndex, treeRemoved,
-        value, operation;
+    var i, j, index, method, modelIndex, modelRemoved, treeIndex, treeRemoved,
+        value;
 
     for (i = 0; i < iterations * 2; i++) {
 
@@ -776,6 +773,8 @@ test('Get value at index using attr()', function () {
 
 test('Calling .each in a compute will bind to length', function () {
     var source = new RBTreeList(['a', 'b', 'c']);
+
+    // Copy the list
     var cloneCompute = can.compute(function () {
         var result = [];
 
@@ -797,4 +796,47 @@ test('Calling .each in a compute will bind to length', function () {
 
     clone = cloneCompute();
     equal(clone[3], 'd', 'Cloned index matches source index');
+});
+
+test('Batch inserts match their progressively inserted equivalents', function () {
+
+    var constructorSequence = [
+        13,6,20,3,10,17,24,1,5,8,12,15,19,22,26,0,2,4,7,9,11,14,16,18,21,23,25];
+    var insertSequence = [
+        23,24,29,30,31,32,33,34,35,36,36,36,36,36,36,36,36,36,36,36,24,26,32,
+        34,36,38,40,42,44,56,55,54,53,52,51,50,49,48,47,46,25,28,35,38,41,44,
+        47,50,53,76,74,72,70,68,66,64,62,60,58,56,26];
+    var controlTree = new RBTreeList();
+    var constructorArray = [];
+    var testTree, insertValue;
+
+    window.controlTree = testTree;
+
+    constructorSequence.forEach(function (insertIndex, index) {
+        // NOTE: "c-" indicates constructor insert
+
+        // [0, 1, 2, ... 26]
+        constructorArray[index] = 'c-' + index;
+
+        // [13, 6, 20, ... 25]
+        controlTree.set(insertIndex, 'c-' + insertIndex);
+    });
+
+
+    window.testTree = testTree = new RBTreeList(constructorArray);
+
+    insertSequence.forEach(function (insertIndex, index) {
+        // NOTE: "i-" indicates subsequent insert
+        insertValue = 'i-' + (constructorArray.length + index);
+
+        controlTree.set(insertIndex, insertValue, true);
+        testTree.set(insertIndex, insertValue, true);
+    });
+
+
+    controlTree.each(function (node, index) {
+        equal(testTree.get(index).value, node.value, 'Values match');
+    });
+
+    equal(testTree.length, controlTree.length, 'Length matches');
 });
