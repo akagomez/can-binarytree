@@ -800,9 +800,9 @@ test('Calling .each in a compute will bind to length', function () {
 
 test('Batch inserts match their progressively inserted equivalents', function () {
 
-    var constructorSequence = [
+    var constructorValues = [
         13,6,20,3,10,17,24,1,5,8,12,15,19,22,26,0,2,4,7,9,11,14,16,18,21,23,25];
-    var insertSequence = [
+    var insertValues = [
         23,24,29,30,31,32,33,34,35,36,36,36,36,36,36,36,36,36,36,36,24,26,32,
         34,36,38,40,42,44,56,55,54,53,52,51,50,49,48,47,46,25,28,35,38,41,44,
         47,50,53,76,74,72,70,68,66,64,62,60,58,56,26];
@@ -812,20 +812,20 @@ test('Batch inserts match their progressively inserted equivalents', function ()
 
     window.controlTree = testTree;
 
-    constructorSequence.forEach(function (insertIndex, index) {
-        // NOTE: "c-" indicates constructor insert
-
+    constructorValues.forEach(function (insertIndex, index) {
         // [0, 1, 2, ... 26]
+        // NOTE: "c-" indicates constructor insert
         constructorArray[index] = 'c-' + index;
 
         // [13, 6, 20, ... 25]
+        // NOTE: "c-" indicates constructor insert
         controlTree.set(insertIndex, 'c-' + insertIndex);
     });
 
 
     window.testTree = testTree = new RBTreeList(constructorArray);
 
-    insertSequence.forEach(function (insertIndex, index) {
+    insertValues.forEach(function (insertIndex, index) {
         // NOTE: "i-" indicates subsequent insert
         insertValue = 'i-' + (constructorArray.length + index);
 
