@@ -209,6 +209,8 @@ TreeBase.prototype.print = function (valueFn, start, count) {
     }
 
     console.log(graph);
+
+    return this;
 };
 
 // Returns a null iterator

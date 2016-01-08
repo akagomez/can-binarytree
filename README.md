@@ -1,132 +1,322 @@
-can-binarytree
-===
+# can-binarytree
 
-This package extends the very well written Javascript binary tree 
-implementations provided by [@vadimg](https://github.com/vadimg/js_bintrees) 
-and and mixes in features of CanJS that make the data structures observable. 
+**can-binarytree** extends the very well written Javascript binary tree
+implementations provided by [@vadimg](https://github.com/vadimg/js_bintrees)
+and and mixes in features of CanJS that make the data structures observable.
 
-NOTE: Currently, the only data structure in the package that is observable is 
-the RBTreeList, which was forked from the RBTree for use in
-CanJS' [derive plugin](https://github.com/canjs/can-derive).
+Note: Currently, the only data structure in the package that is observable is
+the `can.RBTreeList`, which was adapted from the `can.RBTree` data structure
+for use in CanJS' [can-derive plugin](https://github.com/canjs/can-derive).
 
-Data Structures
----
+> - [Install](#install)
+> - [Use](#use)
+> - [Data Structures](#datastructures)
+> - [API](#api)
+>   - [can.RBTreeList](#canrbtreelist)
+>     - [`.attr()`](#attr)
+>     - [`.each()`](#each)
+>     - [`.unshift()`](#unshift)
+>     - [`.push()`](#push)
+>     - [`.splice()`](#splice)
+>     - [`.replace()`](#replace)
+>     - [`.indexOf()`](#indexOf)
+>     - [`.indexOfNode()`](#indexOfNode)
+>     - [`.batchSet()`](#batchSet)
+>     - [`.print()`](#print)
+>     - [`.printIndexes()`](#printIndexes)
+>     - [`.printColors()`](#printColors)
+>     - [`.printParents()`](#printParents)
+>     - [`.printLinks()`](#printLinks)
+>   - [can.RBTree](#canrbtreelist)
+>   - [can.BinTree](#canrbtreelist)
+> - [Contributing](#contributing)
 
-- RBTreeList - A red-black tree implementation that meets the specifications of 
+
+
+
+## Install
+
+Use npm to install `can-binarytree`:
+
+```
+npm install can-binarytree --save
+```
+
+
+## Use
+
+Use `require` in Node/Browserify workflows to import `can-binarytree` like:
+
+```
+var set = require('can-binarytree');
+```
+
+Use `define`, `require` or `import` in [StealJS](http://stealjs.com)
+workflows to import `can-binarytree` like:
+
+```
+import set from 'can-binarytree'
+```
+
+Once you've imported `can-binarytree` into your project, use it to
+create observable binary tree data structures. The following example
+formats and `console.log`'s the current list of values as they are
+added to a Red-Black Tree List:
+
+```js
+var tree = new can.RBTreeList();
+
+tree.bind('add', function () {
+    tree.print(function (node) {
+        return '<' + node.data + '>';
+    });
+})
+
+tree.push('Hop');
+// <Hop>
+
+tree.push('Skip');
+// <Hop>------
+// -----<Skip>
+
+tree.push('Jump');
+// -----<Skip>------
+// <Hop>------<Jump>
+
+```
+
+
+## Data Structures
+
+- RBTreeList - A red-black tree implementation that meets the specifications of
   a can.List
-- RBTree - A self-balancing binary tree that serves as a key-value store 
+- RBTree - A self-balancing binary tree that serves as a key-value store
 - BinTree - A binary tree that is not balanced
 
-Example
----
 
-```javascript
-var RBTreeList = require('can-binarytree/rbtreelist');
+## API
 
-var tree = new RBTreeList(function (a, b) { return a - b; });
 
-tree.bind('add', function (ev, addedItems) {
-  console.log('Inserted:', addedItems);
-});
+### can.RBTreeList
 
-tree.bind('remove', function (ev, removedItems) {
-  console.log('Removed:', removedItems);
-});
 
-// Set
-tree.attr(0, 'A'); // "Inserted: [A]"
-tree.attr(2, 'C');  // "Inserted: [C]"
+#### .attr()
 
-// Get
-tree.attr(0); //-> "A"
-tree.attr(1); //-> undefined
-tree.attr(2); //-> "C"
+`rbTreeList.attr() -> Array`
 
-// Remove value (creates a gap like `delete myArray[index]` would)
-tree.removeNode(0); //-> 'A'
+Returns an array of all the nodes in the `can.RBTreeList`.
 
-// Serialize
-tree.attr() //-> [undefined, undefined, 'C']
+`rbTreeList.attr(index) -> Object`
 
-// Get index of value
-tree.indexOf('C') //-> 2
+Returns the `data` stored on the node in the `can.RBTreeList` at
+the specified index.
 
-// Remove index (decrements the index of subsequent items by 1)
-tree.removeAttr(1);
-tree.removeAttr(2);
+`rbTreeList.attr(index, value) -> can.RBTreeList`
 
-// Get index
-tree.indexOf('C') //-> 0
+Creates a node, sets its `data` property, and inserts it into the
+`can.RBTreeList` at the specified index. If a node already exists at
+the specified index its `data` property is overwritten with the
+specified value.
+
+Returns the `can.RBTreeList`.
+
+
+#### .each()
+
+`rbTreeList.each(callbackFn) -> can.RBTreeList`
+
+Iterates over the nodes in the `can.RBTreeList` invoking `callbackFn` for each
+node. The `callbackFn` is invoked with two arguments: (node, index).
+If the callback returns `false`, the iteration will stop.
+
+
+#### .unshift()
+
+`rbTreeList.unshift(value) -> Number`
+
+Inserts the specified value at the beginning of the `can.RBTreeList`.
+
+Returns the `length` of the `can.RBTreeList`.
+
+
+#### .push()
+
+`rbTreeList.push(value) -> Number`
+
+Inserts the specified value at the end of the `can.RBTreeList`.
+
+Returns the `length` of the `can.RBTreeList`.
+
+
+#### .splice()
+
+`rbTreeList.splice(startIndex, removeCount, nodes...) -> Array`
+
+Changes the content of a `can.RBTreeList` by removing existing nodes
+and/or adding new nodes.
+
+Returns an array of nodes removed from the `can.RBTreeList`.
+
+
+#### .replace()
+
+`rbTreeList.replace(newValues) -> can.RBTreeList`
+
+Changes the content of a `can.RBTreeList` by removing all of the existing nodes
+and inserting new nodes with the values supplied in the `newValues` array.
+
+Returns the `can.RBTreeList`.
+
+
+#### .indexOf()
+
+`rbTreeList.indexOf(value) -> Number`
+
+Returns the first index at which the specified `value` can be found in
+the `can.RBTreeList`, or -1 if it is not present.
+
+
+#### .indexOfNode()
+
+`rbTreeList.indexOfNode(node, useCache) -> Number`
+
+Returns the first index at which the specified `node` can be found in
+the `can.RBTreeList`, or -1 if it is not present.
+
+
+#### .batchSet()
+
+`rbTreeList.batchSet(array, setFn) -> can.RBTreeList`
+
+Populates an empty `can.RBTreeList` in `O(n)` time - compared
+to `O(mlogn)` time - from an array of values.
+
+The `setFn` is invoked for each insert with two arguments:
+(insertIndex, createdNode)
+
+Returns the `can.RBTreeList`.
+
+
+#### .print()
+
+`rbTreeList.print(valueFn, startIndex, printCount) -> can.RBTreeList`
+
+Iterates over the nodes in the `can.RBTreeList` invoking `valueFn` with
+a reference to each node. If no `valueFn` is provided the node's
+`value` property is used.
+
+The value returned from the `valueFn` is concatenated into an ASCII formatted
+string that emulates the parent/child relationships of each node in the
+`can.RBTreeList`. The resulting string is passed to `console.log`.
+
+An example of the formatted string:
 
 ```
-
-Methods
----
-
-#### insert(item)
-> Inserts the item into the tree. Returns true if inserted, false if duplicate.
-
-#### remove(item)
-> Removes the item from the tree. Returns true if removed, false if not found.
-
-#### size
-> Number of nodes in the tree.
-
-#### clear()
-> Removes all nodes from the tree.
-
-#### find(item)
-> Returns node data if found, null otherwise.
-
-#### findIter(item)
-> Returns an iterator to the node if found, null otherwise.
-
-#### lowerBound(item)
-> Returns an interator to the tree node at or immediately after the item. Returns null-iterator if tree is empty.
->> __NOTE: Changed in version 1.0.0 to match C++ lower_bound__
-
-#### upperBound(item)
-> Returns an interator to the tree node immediately after the item. Returns null-iterator if tree is empty.
->> __NOTE: Changed in version 1.0.0 to match C++ upper_bound__
-
-#### min()
-> Returns the min node data in the tree, or null if the tree is empty.
-
-#### max()
-> Returns the max node data in the tree, or null if the tree is empty.
-
-#### each(f)
-> Calls f on each node's data, in order.
-
-#### reach(f)
-> Calls f on each node's data, in reverse order.
-
-#### iterator()
-> Returns a null-iterator. See __Iterators__ section below.
-
-Iterators
----
-
-tree.iterator() will return a null-iterator. On a null iterator,
-* next() will return the first element in the tree
-* prev() will return the last element in the tree
-
-Otherwise,
-* next() will return the next element
-* prev() will return the previous element
-* data() will return the node the iterator is pointing to
-
-When iteration reaches the end, the iterator becomes a null-iterator again.
-
-Forward iteration example:
-
-```javascript
-var it=tree.iterator(), item;
-while((item = it.next()) !== null) {
-    // do stuff with item
-}
+---------Apr------------------------
+---Feb---------------Aug------------
+Jan---Mar------Jun---------Oct------
+------------May---Jul---Sep---Nov---
+---------------------------------Dec
 ```
 
-If you are iterating forward through the tree, you can always call prev() to go back, and vice versa.
+A `startIndex` and `printCount` can also be provided in order to display only
+a subset of the overall nodes in the `can.RBTreeList`.
 
-__NOTE:__ iterators become invalid when you add or remove elements from the tree.
+Returns the `can.RBTreeList`.
+
+
+#### .printIndexes()
+
+`rbTreeList.printIndexes(showCounts, startIndex, printCount) -> can.RBTreeList`
+
+Similar to [`.print()`](#print) except that node `data` value is printed
+alongside the calculated index.
+
+`showCounts` is a `boolean` that defaults to `true` and configures
+whether or not the  `leftCount`, `leftGapCount` and `rightCount` are
+displayed alongside the `data` property.
+
+
+An example of the formatted string (`showCounts` === `false`):
+
+```
+---------------3:Apr------------------------------------------
+-----1:Feb-------------------------7:Aug----------------------
+0:Jan-----2:Mar----------5:Jun---------------9:Oct------------
+--------------------4:May-----6:Jul-----8:Sep-----10:Nov------
+--------------------------------------------------------11:Dec
+```
+
+An example of the formatted string (`showCounts` === `true`):
+
+```
+----------1(1|0|1):B----------
+0(0|0|0):A----------2(0|0|0):C
+```
+
+#### .printColors()
+
+`rbTreeList.printColors() -> can.RBTreeList`
+
+An example of the formatted string:
+
+```
+------------3(B)----------------------------------
+----1(B)--------------------7(B)------------------
+0(B)----2(B)--------5(R)------------9(R)----------
+----------------4(B)----6(B)----8(B)----10(B)-----
+---------------------------------------------11(R)
+```
+
+
+#### .printParents()
+
+```
+-----------(2062^_)-----------
+(2060^2062)--------(2064^2062)
+```
+
+Returns the `can.RBTreeList`.
+
+
+#### .printLinks()
+
+`rbTreeList.printLinks() -> can.RBTreeList`
+
+An example of the formatted string:
+
+```
+_ < Jan > Feb
+Jan < Feb > Mar
+Feb < Mar > Apr
+Mar < Apr > May
+Apr < May > Jun
+May < Jun > Jul
+Jun < Jul > Aug
+Jul < Aug > Sep
+Aug < Sep > Oct
+Sep < Oct > Nov
+Oct < Nov > Dec
+Nov < Dec > _
+```
+
+Returns the `can.RBTreeList`.
+
+#### can.RBTreeList.Node
+
+A reference to the `Node` contstructor used internally by `can.RBTreeList` to
+create nodes.
+
+
+
+### can.RBTree
+
+*Coming soon*
+
+### can.BinTree
+
+*Coming soon*
+
+### can.Tree
+
+*Coming soon*

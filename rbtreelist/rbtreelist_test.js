@@ -543,16 +543,18 @@ test('Get the index of a value', function () {
     });
 });
 
-test('"Holey" indexes are not enumerable', function () {
+test('Uninintialized indexes are not enumerable', function () {
     var tree = new RBTreeList();
     var expected;
 
     tree.set(2, 'C');
 
-    expected = ['C'];
-    tree.each(function (node, i) {
-        equal(node.data, expected.shift());
-    });
+    expected = [];
+    expected[2] = 'C';
+
+    expected.forEach(function (value, index) {
+        equal(tree.get(index).data, value);
+    })
 
     tree.set(0, undefined);
 
@@ -764,7 +766,17 @@ test('Add/remove 1k items (by indexOf)', function () {
 
 });
 
-test('Get value at index using attr()', function () {
+test('Set the value at an index using attr()', function () {
+    var collection = new RBTreeList();
+    collection.attr(0, 'a');
+    collection.attr(1, 'b');
+    collection.attr(2, 'c');
+    equal(collection.attr(0), 'a', 'Got value using .attr()');
+    equal(collection.attr(1), 'b', 'Got value using .attr()');
+    equal(collection.attr(2), 'c', 'Got value using .attr()');
+});
+
+test('Get the value at an index using attr()', function () {
     var collection = new RBTreeList(['a', 'b', 'c']);
     equal(collection.attr(0), 'a', 'Got value using .attr()');
     equal(collection.attr(1), 'b', 'Got value using .attr()');

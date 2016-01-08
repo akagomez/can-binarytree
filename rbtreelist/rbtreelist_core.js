@@ -834,13 +834,13 @@ RBTreeList.prototype.doubleRotate = function (root, dir) {
     return this.singleRotate(root, dir);
 };
 
-RBTreeList.prototype.printIndexes = function (debug, startIndex, count) {
-    this.print(function (node) {
+RBTreeList.prototype.printIndexes = function (showCounts, startIndex, count) {
+    return this.print(function (node) {
         var index = this.indexOfNode(node);
         var value = this._printIndexesValue(node);
         var out = index;
 
-        if (debug !== false) {
+        if (showCounts !== false) {
             out += '(' + node.leftCount + '|' +
                 node.leftGapCount + '|' +
                 node.rightCount + ')';
@@ -852,7 +852,7 @@ RBTreeList.prototype.printIndexes = function (debug, startIndex, count) {
 };
 
 RBTreeList.prototype.printColors = function (startIndex, count) {
-    this.print(function (node) {
+    return this.print(function (node) {
         var index = this.indexOfNode(node);
         var out = index;
 
@@ -863,7 +863,7 @@ RBTreeList.prototype.printColors = function (startIndex, count) {
 };
 
 RBTreeList.prototype.printParents = function (startIndex, count) {
-    this.print(function (node) {
+    return this.print(function (node) {
         var out = '(' + node.id + '^' + (node.parent ? node.parent.id : '_') + ')';
         return out;
     }, startIndex, count);
@@ -879,6 +879,7 @@ RBTreeList.prototype.printLinks = function () {
         out +=  left + ' < ' + node.data + ' > ' + right + '\n';
     });
     console.log(out);
+    return this;
 };
 
 RBTreeList.prototype._printIndexesValue = function (node) {
