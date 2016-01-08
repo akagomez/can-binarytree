@@ -15,7 +15,7 @@ RBTreeList = can.List.extend(can.simpleExtend(rbTreeCoreProto, {
         // Call the default can.List setup method without the instances
         var setupResult = List.prototype.setup.call(this, undefined, options);
 
-        // CanJS 3.0
+        // CanJS 2.3
         if (this.___get) {
             this.___get = this.____get;
 
