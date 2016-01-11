@@ -99,6 +99,10 @@ RBTreeList = can.List.extend(can.simpleExtend(rbTreeCoreProto, {
         return RBTreeCore.prototype.each.apply(this, arguments);
     },
 
+    deleteAttr: function (index) {
+        return this.unset.apply(this, [index, false]);
+    },
+
     // Prevent calling can.List.prototype.__set becuase it attempts to handle
     // holey array values, which the RBTreeList already handles
     __set: can.Map.prototype.__set,

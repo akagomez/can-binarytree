@@ -234,8 +234,8 @@ RBTreeList.prototype.indexOf = function (value) {
         return index;
     }
 
-    this.each(function (node, i) {
-        if (node.data === value) {
+    this.each(function (data, i) {
+        if (data === value) {
             index = i;
             return false;
         }
@@ -760,7 +760,7 @@ RBTreeList.prototype._removeNode = function (found, node, remove) {
 };
 
 // Calls cb on each node, in order
-RBTreeList.prototype.each = function (cb, context) {
+RBTreeList.prototype.eachNode = function (cb, context) {
     var iterator = this.iterator();
 
     while (iterator.next() !== null) {
@@ -773,6 +773,15 @@ RBTreeList.prototype.each = function (cb, context) {
             break;
         }
     }
+
+    return this;
+};
+
+// Calls cb on each node value, in order
+RBTreeList.prototype.each = function (cb, context) {
+    return this.eachNode(function (node, index) {
+        return cb.apply(context, [node.data, index]);
+    }, context);
 };
 
 // Returns null if tree is empty

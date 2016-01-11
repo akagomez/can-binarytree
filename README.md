@@ -10,25 +10,30 @@ for use in CanJS' [can-derive plugin](https://github.com/canjs/can-derive).
 
 > - [Install](#install)
 > - [Use](#use)
-> - [Data Structures](#datastructures)
+> - [Data Structures](#data-structures)
 > - [API](#api)
 >   - [can.RBTreeList](#canrbtreelist)
 >     - [`.attr()`](#attr)
+>     - [`.batchSet()`](#batchset)
+>     - [`.deleteAttr()`](#deleteattr)
 >     - [`.each()`](#each)
->     - [`.unshift()`](#unshift)
+>     - [`.eachNode()`](#each)
+>     - [`.filter()`](#filter)
+>     - [`.indexOf()`](#indexof)
+>     - [`.indexOfNode()`](#indexofnode)
+>     - [`.map()`](#map)
 >     - [`.push()`](#push)
->     - [`.splice()`](#splice)
->     - [`.replace()`](#replace)
->     - [`.indexOf()`](#indexOf)
->     - [`.indexOfNode()`](#indexOfNode)
->     - [`.batchSet()`](#batchSet)
 >     - [`.print()`](#print)
->     - [`.printIndexes()`](#printIndexes)
->     - [`.printColors()`](#printColors)
->     - [`.printParents()`](#printParents)
->     - [`.printLinks()`](#printLinks)
->   - [can.RBTree](#canrbtreelist)
->   - [can.BinTree](#canrbtreelist)
+>     - [`.printIndexes()`](#printindexes)
+>     - [`.printColors()`](#printcolors)
+>     - [`.printParents()`](#printparents)
+>     - [`.printLinks()`](#printlinks)
+>     - [`.removeAttr()`](#removeattr)
+>     - [`.replace()`](#replace)
+>     - [`.splice()`](#splice)
+>     - [`.unshift()`](#unshift)
+>   - [can.RBTree](#canrbtree)
+>   - [can.BinTree](#canbintree)
 > - [Contributing](#contributing)
 
 
@@ -104,7 +109,8 @@ tree.push('Jump');
 
 `rbTreeList.attr() -> Array`
 
-Returns an array of all the nodes in the `can.RBTreeList`.
+Returns an array of all the nodes' `data` property value in the
+`can.RBTreeList`.
 
 `rbTreeList.attr(index) -> Object`
 
@@ -121,7 +127,36 @@ specified value.
 Returns the `can.RBTreeList`.
 
 
+#### .removeAttr()
+
+`rbTreeList.removeAttr(index) -> Object`
+
+Removes the node at the specified `index` while decrementing the indices of
+of all subsequent items in the `RBTreeList` by 1.
+
+Returns the value of the node's `data` property that was removed.
+
+
+#### .deleteAttr()
+
+`rbTreeList.removeAttr(index) -> Object`
+
+Removes the node at the specified `index` without decrementing the indices of
+of all subsequent items in the `RBTreeList` by 1.
+
+Returns the value of the node's `data` property that was removed.
+
+
 #### .each()
+
+`rbTreeList.each(callbackFn) -> can.RBTreeList`
+
+Iterates over the nodes in the `can.RBTreeList` invoking `callbackFn` for each
+node's `data` property. The `callbackFn` is invoked with two arguments:
+(node, index). If the callback returns `false`, the iteration will stop.
+
+
+#### .eachNode()
 
 `rbTreeList.each(callbackFn) -> can.RBTreeList`
 
@@ -166,6 +201,29 @@ Changes the content of a `can.RBTreeList` by removing all of the existing nodes
 and inserting new nodes with the values supplied in the `newValues` array.
 
 Returns the `can.RBTreeList`.
+
+
+#### .filter()
+
+`rbTreeList.filter(predicateFn, context) -> can.RBTreeList`
+
+Iterates the elements in the `can.RBTreeList` returning a new
+`can.RBTreeList` instance of all elements `prediateFn` returns truthy for.
+The `predicateFn` is invoked in the specified `context` with the arguments:
+(value, index, rbTreeList).
+
+Returns a new `can.RBTreeList` instance.
+
+
+#### .map()
+
+`rbTreeList.map(mapFn, context) -> can.RBTreeList`
+
+Creates an `can.RBTreeList` of values by running each element in the
+`can.RBTreeList` through `mapFn`. The iteratee is invoked in the specified
+`context` with three arguments: (value, index, rbTreeList).
+
+Returns a new `can.RBTreeList` instance.
 
 
 #### .indexOf()

@@ -1,6 +1,6 @@
 var QUnit = require("steal-qunit");
 var RBTreeList = require('rbtreelist/rbtreelist');
-
+window.can.RBTreeList = RBTreeList;
 require('can/compute/compute');
 
 QUnit.module('can.RBTreeList');
@@ -527,7 +527,7 @@ test('Get the index of a node', function () {
     // Fill the tree with values
     tree.splice.apply(tree, [0, 0].concat(alphabet));
 
-    tree.each(function (node, i) {
+    tree.eachNode(function (node, i) {
         equal(tree.indexOfNode(node), i, 'Index is correct');
     });
 });
@@ -559,8 +559,8 @@ test('Uninintialized indexes are not enumerable', function () {
     tree.set(0, undefined);
 
     expected = [undefined, 'C'];
-    tree.each(function (node, i) {
-        equal(node.data, expected.shift());
+    tree.each(function (value, i) {
+        equal(value, expected.shift());
     });
 });
 
@@ -570,8 +570,10 @@ test('Iterable with can.each()', function () {
 
     // Fill the tree with values
     tree.splice.apply(tree, [0, 0].concat(alphabet));
-    expected.forEach(function (letter, index) {
-        equal(tree.attr(index), letter, 'Value matches');
+
+    // Iterate values, not nodes
+    can.each(tree, function (letter, index) {
+        equal(letter, expected[index], 'Value matches');
     });
 });
 
@@ -766,7 +768,7 @@ test('Add/remove 1k items (by indexOf)', function () {
 
 });
 
-test('Set the value at an index using attr()', function () {
+test('Set the value at an index using attr([index], [value])', function () {
     var collection = new RBTreeList();
     collection.attr(0, 'a');
     collection.attr(1, 'b');
@@ -776,7 +778,7 @@ test('Set the value at an index using attr()', function () {
     equal(collection.attr(2), 'c', 'Got value using .attr()');
 });
 
-test('Get the value at an index using attr()', function () {
+test('Get the value at an index using attr([index])', function () {
     var collection = new RBTreeList(['a', 'b', 'c']);
     equal(collection.attr(0), 'a', 'Got value using .attr()');
     equal(collection.attr(1), 'b', 'Got value using .attr()');
@@ -791,7 +793,7 @@ test('Calling .each in a compute will bind to length', function () {
         var result = [];
 
         source.each(function (item) {
-            result.push(item.data);
+            result.push(item);
         });
 
         return result;
@@ -851,4 +853,65 @@ test('Batch inserts match their progressively inserted equivalents', function ()
     });
 
     equal(testTree.length, controlTree.length, 'Length matches');
+});
+
+test('.removeAttr() removes a key/value', function () {
+    var tree = new RBTreeList(['a', 'b', 'c']);
+    var expected = new can.List(['a', 'b', 'c']);
+
+    var returned = tree.removeAttr(1);
+    expected.removeAttr(1);
+
+    equal(tree.attr(1), expected.attr(1), 'Value at index was removed');
+    deepEqual(returned, 'b', 'Returned an array of removed values');
+});
+
+
+test('.deleteAttr() creates a sparse array', function () {
+    var tree = new RBTreeList(['a', 'b', 'c']);
+    var expected = ['a', 'b', 'c'];
+    var treeIterations = [];
+    var expectedIterations = [];
+
+    tree.deleteAttr(1);
+    delete expected[1];
+
+    equal(tree.attr(1), expected[1], 'Value at index was uninintialized');
+
+    tree.each(function (value, index) {
+        treeIterations.push(value);
+    });
+
+    expected.forEach(function (value, index) {
+        expectedIterations.push(value);
+    });
+
+    equal(treeIterations.length, expectedIterations.length,
+        'The correct number of indices where iterated');
+
+    deepEqual(treeIterations, expectedIterations, 'Iterated values match');
+});
+
+
+test('.attr() returns all values', function () {
+    var expected = ['a', 'b', 'c'];
+    var tree = new RBTreeList(expected);
+    var values = tree.attr();
+
+    equal(values[0], expected[0], '1st value is correct');
+    equal(values[1], expected[1], '2nd value is correct');
+    equal(values[2], expected[2], '3rd value is correct');
+    equal(values.length, expected.length, '"length" is correct');
+});
+
+test('.filter() returns subset of values', function () {
+    var tree = new RBTreeList(['a', 'b', 'c']);
+
+    var filtered = tree.filter(function (letter) {
+        return letter === 'b';
+    });
+
+    ok(filtered instanceof can.RBTreeList, 'Is an RBTreeList');
+    equal(filtered.length, 1, '"length" is correct');
+    equal(filtered.attr(0), 'b', 'Contains the correct value');
 });
