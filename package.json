@@ -43,7 +43,7 @@
     "release:major": "npm version major && npm publish",
     "jshint": "jshint rbtreelist/. treebase/. test/. --config",
     "testee": "testee test/index.html --browsers phantom",
-    "test": "npm run testee",
+    "test": "npm run jshint && npm run testee",
     "build": "node build.js"
   }
 }

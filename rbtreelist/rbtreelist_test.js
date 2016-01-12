@@ -554,7 +554,7 @@ test('Uninintialized indexes are not enumerable', function () {
 
     expected.forEach(function (value, index) {
         equal(tree.get(index).data, value);
-    })
+    });
 
     tree.set(0, undefined);
 

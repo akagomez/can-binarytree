@@ -1,3 +1,5 @@
+var Iterator;
+
 function TreeBase() {}
 
 // Removes all nodes from the tree

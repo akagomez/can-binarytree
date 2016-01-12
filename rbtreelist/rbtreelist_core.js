@@ -357,8 +357,8 @@ RBTreeList.prototype.batchSet = function (values, setCallback) {
     var nodes = [];
     var head, root, i;
 
-    if (typeof length === 'undefined' || length <= 0
-        || typeof values.slice === 'undefined') {
+    if (typeof length === 'undefined' || length <= 0 ||
+        typeof values.slice === 'undefined') {
         return;
     }
 
