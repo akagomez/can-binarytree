@@ -231,7 +231,7 @@ TreeBase.prototype.print = function (valueFn, start, count) {
                 }
             }
         }
-        graph += "\n";
+        graph += '\n';
     }
 
     console.log(graph);
