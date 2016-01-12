@@ -812,7 +812,7 @@ test('Calling .each in a compute will bind to length', function () {
     equal(clone[3], 'd', 'Cloned index matches source index');
 });
 
-test('Batch inserts match their progressively inserted equivalents', function () {
+test('batchSet\'s match their progressively inserted equivalents', function () {
 
     var constructorValues = [
         13,6,20,3,10,17,24,1,5,8,12,15,19,22,26,0,2,4,7,9,11,14,16,18,21,23,25];

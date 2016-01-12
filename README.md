@@ -17,21 +17,17 @@ for use in CanJS' [can-derive plugin](https://github.com/canjs/can-derive).
 >     - [`.batchSet()`](#batchset)
 >     - [`.deleteAttr()`](#deleteattr)
 >     - [`.each()`](#each)
->     - [`.eachNode()`](#each)
+>     - [`.eachNode()`](#eachnode)
 >     - [`.filter()`](#filter)
 >     - [`.indexOf()`](#indexof)
 >     - [`.indexOfNode()`](#indexofnode)
 >     - [`.map()`](#map)
 >     - [`.push()`](#push)
->     - [`.print()`](#print)
->     - [`.printIndexes()`](#printindexes)
->     - [`.printColors()`](#printcolors)
->     - [`.printParents()`](#printparents)
->     - [`.printLinks()`](#printlinks)
 >     - [`.removeAttr()`](#removeattr)
 >     - [`.replace()`](#replace)
 >     - [`.splice()`](#splice)
 >     - [`.unshift()`](#unshift)
+>   - [can.RBTreeList.Node](#canrbtreelistnode)
 >   - [can.RBTree](#canrbtree)
 >   - [can.BinTree](#canbintree)
 > - [Contributing](#contributing)
@@ -126,6 +122,10 @@ specified value.
 
 Returns the `can.RBTreeList`.
 
+`rbTreeList.attr('length') -> can.RBTreeList`
+
+Returns the `length` of the `can.RBTreeList`.
+
 
 #### .removeAttr()
 
@@ -142,7 +142,8 @@ Returns the value of the node's `data` property that was removed.
 `rbTreeList.removeAttr(index) -> Object`
 
 Removes the node at the specified `index` without decrementing the indices of
-of all subsequent items in the `RBTreeList` by 1.
+of all subsequent items in the `RBTreeList` by 1. This resulting `index`
+will not be iterable with `.each()` until it is set or removed.
 
 Returns the value of the node's `data` property that was removed.
 
@@ -153,12 +154,12 @@ Returns the value of the node's `data` property that was removed.
 
 Iterates over the nodes in the `can.RBTreeList` invoking `callbackFn` for each
 node's `data` property. The `callbackFn` is invoked with two arguments:
-(node, index). If the callback returns `false`, the iteration will stop.
+(value, index). If the callback returns `false`, the iteration will stop.
 
 
 #### .eachNode()
 
-`rbTreeList.each(callbackFn) -> can.RBTreeList`
+`rbTreeList.eachNode(callbackFn) -> can.RBTreeList`
 
 Iterates over the nodes in the `can.RBTreeList` invoking `callbackFn` for each
 node. The `callbackFn` is invoked with two arguments: (node, index).
@@ -255,112 +256,7 @@ The `setFn` is invoked for each insert with two arguments:
 Returns the `can.RBTreeList`.
 
 
-#### .print()
-
-`rbTreeList.print(valueFn, startIndex, printCount) -> can.RBTreeList`
-
-Iterates over the nodes in the `can.RBTreeList` invoking `valueFn` with
-a reference to each node. If no `valueFn` is provided the node's
-`value` property is used.
-
-The value returned from the `valueFn` is concatenated into an ASCII formatted
-string that emulates the parent/child relationships of each node in the
-`can.RBTreeList`. The resulting string is passed to `console.log`.
-
-An example of the formatted string:
-
-```
----------Apr------------------------
----Feb---------------Aug------------
-Jan---Mar------Jun---------Oct------
-------------May---Jul---Sep---Nov---
----------------------------------Dec
-```
-
-A `startIndex` and `printCount` can also be provided in order to display only
-a subset of the overall nodes in the `can.RBTreeList`.
-
-Returns the `can.RBTreeList`.
-
-
-#### .printIndexes()
-
-`rbTreeList.printIndexes(showCounts, startIndex, printCount) -> can.RBTreeList`
-
-Similar to [`.print()`](#print) except that node `data` value is printed
-alongside the calculated index.
-
-`showCounts` is a `boolean` that defaults to `true` and configures
-whether or not the  `leftCount`, `leftGapCount` and `rightCount` are
-displayed alongside the `data` property.
-
-
-An example of the formatted string (`showCounts` === `false`):
-
-```
----------------3:Apr------------------------------------------
------1:Feb-------------------------7:Aug----------------------
-0:Jan-----2:Mar----------5:Jun---------------9:Oct------------
---------------------4:May-----6:Jul-----8:Sep-----10:Nov------
---------------------------------------------------------11:Dec
-```
-
-An example of the formatted string (`showCounts` === `true`):
-
-```
-----------1(1|0|1):B----------
-0(0|0|0):A----------2(0|0|0):C
-```
-
-#### .printColors()
-
-`rbTreeList.printColors() -> can.RBTreeList`
-
-An example of the formatted string:
-
-```
-------------3(B)----------------------------------
-----1(B)--------------------7(B)------------------
-0(B)----2(B)--------5(R)------------9(R)----------
-----------------4(B)----6(B)----8(B)----10(B)-----
----------------------------------------------11(R)
-```
-
-
-#### .printParents()
-
-```
------------(2062^_)-----------
-(2060^2062)--------(2064^2062)
-```
-
-Returns the `can.RBTreeList`.
-
-
-#### .printLinks()
-
-`rbTreeList.printLinks() -> can.RBTreeList`
-
-An example of the formatted string:
-
-```
-_ < Jan > Feb
-Jan < Feb > Mar
-Feb < Mar > Apr
-Mar < Apr > May
-Apr < May > Jun
-May < Jun > Jul
-Jun < Jul > Aug
-Jul < Aug > Sep
-Aug < Sep > Oct
-Sep < Oct > Nov
-Oct < Nov > Dec
-Nov < Dec > _
-```
-
-Returns the `can.RBTreeList`.
-
-#### can.RBTreeList.Node
+### can.RBTreeList.Node
 
 A reference to the `Node` contstructor used internally by `can.RBTreeList` to
 create nodes.

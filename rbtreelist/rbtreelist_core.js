@@ -843,6 +843,34 @@ RBTreeList.prototype.doubleRotate = function (root, dir) {
     return this.singleRotate(root, dir);
 };
 
+/**
+ * #### .printIndexes()
+ *
+ * Similar to `.print()` except that the calculated index is printed
+ * alongside node `data` property's value.
+ *
+ * `showCounts` is a `boolean` that defaults to `true` and configures
+ * whether or not the  `leftCount`, `leftGapCount` and `rightCount` are
+ * displayed alongside the `data` property.
+ *
+ * An example of the formatted string (`showCounts` === `false`):
+ *
+ * ```
+ * ---------------3:Apr------------------------------------------
+ * -----1:Feb-------------------------7:Aug----------------------
+ * 0:Jan-----2:Mar----------5:Jun---------------9:Oct------------
+ * --------------------4:May-----6:Jul-----8:Sep-----10:Nov------
+ * --------------------------------------------------------11:Dec
+ * ```
+ *
+ * An example of the formatted string (`showCounts` === `true`):
+ *
+ * ```
+ * ----------1(1|0|1):B----------
+ * 0(0|0|0):A----------2(0|0|0):C
+ * ```
+ **/
+
 RBTreeList.prototype.printIndexes = function (showCounts, startIndex, count) {
     return this.print(function (node) {
         var index = this.indexOfNode(node);
@@ -860,6 +888,22 @@ RBTreeList.prototype.printIndexes = function (showCounts, startIndex, count) {
     }, startIndex, count);
 };
 
+/**
+ * #### .printColors()
+ *
+ * A utility for debugging
+ *
+ * An example of the formatted string:
+ *
+ * ```
+ * ------------3(B)----------------------------------
+ * ----1(B)--------------------7(B)------------------
+ * 0(B)----2(B)--------5(R)------------9(R)----------
+ * ----------------4(B)----6(B)----8(B)----10(B)-----
+ * ---------------------------------------------11(R)
+ * ```
+ **/
+
 RBTreeList.prototype.printColors = function (startIndex, count) {
     return this.print(function (node) {
         var index = this.indexOfNode(node);
@@ -871,12 +915,54 @@ RBTreeList.prototype.printColors = function (startIndex, count) {
     }, startIndex, count);
 };
 
+/**
+ * #### .printParents()
+ *
+ * A utility for debugging the parent references of each node in
+ * the tree. Each node is formatted as `([leftNodeId]^[parentNodeId])`
+ *
+ * An example of the formatted string:
+ *
+ * ```
+ * -----------(2062^_)-----------
+ * (2060^2062)--------(2064^2062)
+ * ```
+ *
+ * Returns the `can.RBTreeList`.
+ **/
+
 RBTreeList.prototype.printParents = function (startIndex, count) {
     return this.print(function (node) {
         var out = '(' + node.id + '^' + (node.parent ? node.parent.id : '_') + ')';
         return out;
     }, startIndex, count);
 };
+
+/**
+ * #### .printLinks()
+ *
+ * A utility for debugging the linked list of nodes. Each node
+ * is formatted as ([leftNodeValue] < [nodeValue] > [rightNodeValue])
+ *
+ * An example of the formatted string:
+ *
+ * ```
+ * _ < Jan > Feb
+ * Jan < Feb > Mar
+ * Feb < Mar > Apr
+ * Mar < Apr > May
+ * Apr < May > Jun
+ * May < Jun > Jul
+ * Jun < Jul > Aug
+ * Jul < Aug > Sep
+ * Aug < Sep > Oct
+ * Sep < Oct > Nov
+ * Oct < Nov > Dec
+ * Nov < Dec > _
+ * ```
+ *
+ * Returns the `can.RBTreeList`.
+ **/
 
 RBTreeList.prototype.printLinks = function () {
     var out = '';

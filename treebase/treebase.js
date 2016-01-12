@@ -164,6 +164,32 @@ TreeBase.prototype.max = function () {
     return res.data;
 };
 
+/**
+ * #### .print()
+ *
+ * Iterates over the nodes in the `can.RBTreeList` invoking `valueFn` with
+ * a reference to each node. If no `valueFn` is provided the node's
+ * `data` property is used.
+ *
+ * The value returned from the `valueFn` is concatenated into an ASCII formatted
+ * string that emulates the parent/child relationships of each node in the
+ * `can.RBTreeList`. The resulting string is passed to `console.log`.
+ *
+ * An example of the formatted string:
+ *
+ * ```
+ * ---------Apr------------------------
+ * ---Feb---------------Aug------------
+ * Jan---Mar------Jun---------Oct------
+ * ------------May---Jul---Sep---Nov---
+ * ---------------------------------Dec
+ * ```
+ *
+ * A `startIndex` and `printCount` can also be provided in order to display only
+ * a subset of the overall nodes in the `can.RBTreeList`.
+ **/
+
+
 TreeBase.prototype.print = function (valueFn, start, count) {
     var coords = {};
     var lengths = {};
