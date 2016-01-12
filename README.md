@@ -1,5 +1,7 @@
 # can-binarytree
 
+[![Build Status](https://travis-ci.org/canjs/can-binarytree.svg?branch=master)](https://travis-ci.org/canjs/can-binarytree)
+
 **can-binarytree** extends the very well written Javascript binary tree
 implementations provided by [@vadimg](https://github.com/vadimg/js_bintrees)
 and and mixes in features of CanJS that make the data structures observable.
