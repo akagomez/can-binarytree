@@ -26,6 +26,15 @@ function Node (data, isHead) {
     this.prev = null;
 }
 
+/**
+ * #### .getChild()
+ *
+ * `node.getChild(direction) -> Node`
+ *
+ * If `direction` is truthy, returns `node.right`. Otherwise `node.left`
+ * is returned.
+ **/
+
 Node.prototype.getChild = function (dir) {
     return dir ? this.right : this.left;
 };
@@ -46,6 +55,16 @@ Node.prototype.debugCircularParents = function (encountered) {
     }
 };
 
+
+/**
+ * #### .setChild()
+ *
+ * `node.setChild(direction, childNode) -> Node`
+ *
+ * Assigns `childNode` to `node.left` if `direction` is truthy. Otherwise
+ * it assigns `childNode` to `node.right`. Additionally calls
+ * [`node.updateChildCount`](#nodeupdatechildcount).
+ **/
 
 Node.prototype.setChild = function (dir, node) {
 
@@ -70,7 +89,21 @@ Node.prototype.setChild = function (dir, node) {
     }
 
     this.updateChildCount();
+
+    return this;
 };
+
+/**
+ * #### .updateChildCount()
+ *
+ * `node.updateChildCount() -> Node`
+ *
+ * Recursively traverses this node and its parent nodes while calculating the
+ * `leftCount`, `leftGapCount`, and `rightCount` based on the
+ * `leftCount`, `leftGapCount`, and `rightCount` of it's left and right
+ * children.
+ **/
+
 
 Node.prototype.updateChildCount = function () {
     this.rightCount = ! this.right ? 0 :
@@ -86,7 +119,22 @@ Node.prototype.updateChildCount = function () {
     if (this.parent && this.parent !== this) {
         this.parent.updateChildCount();
     }
+
+    return this;
 };
+
+
+/**
+ * #### .setSibling()
+ *
+ * `node.setSibling(direction, siblingNode, doSplice) -> Node`
+ *
+ * Assigns `siblingNode` to `node.next` if `direction` is truthy. Otherwise
+ * it assigns `siblingNode` to `node.prev`.
+ *
+ * If `doSplice` is truthy the `node`'s existing `node.next` reference will
+ * be assigned to `siblingNode.next`.
+ **/
 
 Node.prototype.setSibling = function (dir, node, splice) {
     var link = dir ? 'next' : 'prev';
@@ -105,6 +153,8 @@ Node.prototype.setSibling = function (dir, node, splice) {
     }
 
     this[link] = node;
+
+    return this;
 };
 
 
