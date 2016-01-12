@@ -48,15 +48,15 @@ npm install can-binarytree --save
 
 Use `require` in Node/Browserify workflows to import `can-binarytree` like:
 
-```
-var set = require('can-binarytree');
+```js
+var binaryTree = require('can-binarytree');
 ```
 
 Use `define`, `require` or `import` in [StealJS](http://stealjs.com)
 workflows to import `can-binarytree` like:
 
-```
-import set from 'can-binarytree'
+```js
+import binaryTree from 'can-binarytree'
 ```
 
 Once you've imported `can-binarytree` into your project, use it to
@@ -260,7 +260,6 @@ Returns the `length` of the `can.RBTreeList`.
 
 A reference to the `Node` contstructor used internally by `can.RBTreeList` to
 create nodes.
-
 
 
 ### can.RBTree
