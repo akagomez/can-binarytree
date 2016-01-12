@@ -127,14 +127,17 @@ Returns the `can.RBTreeList`.
 Returns the `length` of the `can.RBTreeList`.
 
 
-#### .removeAttr()
+#### .batchSet()
 
-`rbTreeList.removeAttr(index) -> Object`
+`rbTreeList.batchSet(array, setFn) -> can.RBTreeList`
 
-Removes the node at the specified `index` while decrementing the indices of
-of all subsequent items in the `RBTreeList` by 1.
+Populates an empty `can.RBTreeList` in `O(n)` time - compared
+to `O(mlogn)` time - from an array of values.
 
-Returns the value of the node's `data` property that was removed.
+The `setFn` is invoked for each insert with two arguments:
+(insertIndex, createdNode)
+
+Returns the `can.RBTreeList`.
 
 
 #### .deleteAttr()
@@ -166,44 +169,6 @@ node. The `callbackFn` is invoked with two arguments: (node, index).
 If the callback returns `false`, the iteration will stop.
 
 
-#### .unshift()
-
-`rbTreeList.unshift(value) -> Number`
-
-Inserts the specified value at the beginning of the `can.RBTreeList`.
-
-Returns the `length` of the `can.RBTreeList`.
-
-
-#### .push()
-
-`rbTreeList.push(value) -> Number`
-
-Inserts the specified value at the end of the `can.RBTreeList`.
-
-Returns the `length` of the `can.RBTreeList`.
-
-
-#### .splice()
-
-`rbTreeList.splice(startIndex, removeCount, nodes...) -> Array`
-
-Changes the content of a `can.RBTreeList` by removing existing nodes
-and/or adding new nodes.
-
-Returns an array of nodes removed from the `can.RBTreeList`.
-
-
-#### .replace()
-
-`rbTreeList.replace(newValues) -> can.RBTreeList`
-
-Changes the content of a `can.RBTreeList` by removing all of the existing nodes
-and inserting new nodes with the values supplied in the `newValues` array.
-
-Returns the `can.RBTreeList`.
-
-
 #### .filter()
 
 `rbTreeList.filter(predicateFn, context) -> can.RBTreeList`
@@ -212,17 +177,6 @@ Iterates the elements in the `can.RBTreeList` returning a new
 `can.RBTreeList` instance of all elements `prediateFn` returns truthy for.
 The `predicateFn` is invoked in the specified `context` with the arguments:
 (value, index, rbTreeList).
-
-Returns a new `can.RBTreeList` instance.
-
-
-#### .map()
-
-`rbTreeList.map(mapFn, context) -> can.RBTreeList`
-
-Creates an `can.RBTreeList` of values by running each element in the
-`can.RBTreeList` through `mapFn`. The iteratee is invoked in the specified
-`context` with three arguments: (value, index, rbTreeList).
 
 Returns a new `can.RBTreeList` instance.
 
@@ -243,17 +197,63 @@ Returns the first index at which the specified `node` can be found in
 the `can.RBTreeList`, or -1 if it is not present.
 
 
-#### .batchSet()
+#### .map()
 
-`rbTreeList.batchSet(array, setFn) -> can.RBTreeList`
+`rbTreeList.map(mapFn, context) -> can.RBTreeList`
 
-Populates an empty `can.RBTreeList` in `O(n)` time - compared
-to `O(mlogn)` time - from an array of values.
+Creates an `can.RBTreeList` of values by running each element in the
+`can.RBTreeList` through `mapFn`. The iteratee is invoked in the specified
+`context` with three arguments: (value, index, rbTreeList).
 
-The `setFn` is invoked for each insert with two arguments:
-(insertIndex, createdNode)
+Returns a new `can.RBTreeList` instance.
+
+
+#### .push()
+
+`rbTreeList.push(value) -> Number`
+
+Inserts the specified value at the end of the `can.RBTreeList`.
+
+Returns the `length` of the `can.RBTreeList`.
+
+
+#### .removeAttr()
+
+`rbTreeList.removeAttr(index) -> Object`
+
+Removes the node at the specified `index` while decrementing the indices of
+of all subsequent items in the `RBTreeList` by 1.
+
+Returns the value of the node's `data` property that was removed.
+
+
+#### .replace()
+
+`rbTreeList.replace(newValues) -> can.RBTreeList`
+
+Changes the content of a `can.RBTreeList` by removing all of the existing nodes
+and inserting new nodes with the values supplied in the `newValues` array.
 
 Returns the `can.RBTreeList`.
+
+
+#### .splice()
+
+`rbTreeList.splice(startIndex, removeCount, nodes...) -> Array`
+
+Changes the content of a `can.RBTreeList` by removing existing nodes
+and/or adding new nodes.
+
+Returns an array of nodes removed from the `can.RBTreeList`.
+
+
+#### .unshift()
+
+`rbTreeList.unshift(value) -> Number`
+
+Inserts the specified value at the beginning of the `can.RBTreeList`.
+
+Returns the `length` of the `can.RBTreeList`.
 
 
 ### can.RBTreeList.Node
