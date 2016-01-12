@@ -4,10 +4,6 @@
 implementations provided by [@vadimg](https://github.com/vadimg/js_bintrees)
 and and mixes in features of CanJS that make the data structures observable.
 
-Note: Currently, the only data structure in the package that is observable is
-the `can.RBTreeList`, which was adapted from the `can.RBTree` data structure
-for use in CanJS' [can-derive plugin](https://github.com/canjs/can-derive).
-
 > - [Install](#install)
 > - [Use](#use)
 > - [Data Structures](#data-structures)
@@ -49,41 +45,33 @@ npm install can-binarytree --save
 Use `require` in Node/Browserify workflows to import `can-binarytree` like:
 
 ```js
-var binaryTree = require('can-binarytree');
+var can = require('can');
+require('can-binarytree');
 ```
 
 Use `define`, `require` or `import` in [StealJS](http://stealjs.com)
 workflows to import `can-binarytree` like:
 
 ```js
-import binaryTree from 'can-binarytree'
+import can from 'can';
+import 'can-binarytree';
 ```
 
 Once you've imported `can-binarytree` into your project, use it to
 create observable binary tree data structures. The following example
-formats and `console.log`'s the current list of values as they are
-added to a Red-Black Tree List:
+`console.log`'s some metadata about each node that's added to a
+`can.RBTreeList`:
 
 ```js
 var tree = new can.RBTreeList();
 
-tree.bind('add', function () {
-    tree.print(function (node) {
-        return '<' + node.data + '>';
-    });
+tree.bind('add', function (ev, nodes) {
+    console.log(node[0]);
 })
 
-tree.push('Hop');
-// <Hop>
-
-tree.push('Skip');
-// <Hop>------
-// -----<Skip>
-
-tree.push('Jump');
-// -----<Skip>------
-// <Hop>------<Jump>
-
+tree.push('Hop'); // Node {id: 0, parent: null, data: "Hop", left: null, right: null...}
+tree.push('Skip'); // Node {id: 2, parent: Node, data: "Skip", left: null, right: null...}
+tree.push('Jump'); // Node {id: 4, parent: Node, data: "Jump", left: null, right: null...}
 ```
 
 
@@ -94,12 +82,18 @@ tree.push('Jump');
 - RBTree - A self-balancing binary tree that serves as a key-value store
 - BinTree - A binary tree that is not balanced
 
+Note: Currently, the only data structure in the package that is observable is
+the `can.RBTreeList`.
+
 
 ## API
 
 
 ### can.RBTreeList
 
+A red-black tree that uses a numeric "index" as the "key" in the same way
+a `can.List` or native Javascript array might, yet still performs insert and
+remove operations in `O(log n)` time.
 
 #### .attr()
 
