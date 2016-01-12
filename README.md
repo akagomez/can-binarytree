@@ -45,7 +45,7 @@ npm install can-binarytree --save
 Use `require` in Node/Browserify workflows to import `can-binarytree` like:
 
 ```js
-var can = require('can');
+require('can');
 require('can-binarytree');
 ```
 
@@ -53,7 +53,7 @@ Use `define`, `require` or `import` in [StealJS](http://stealjs.com)
 workflows to import `can-binarytree` like:
 
 ```js
-import can from 'can';
+import 'can';
 import 'can-binarytree';
 ```
 
