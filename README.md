@@ -12,7 +12,7 @@ for use in CanJS' [can-derive plugin](https://github.com/canjs/can-derive).
 > - [Use](#use)
 > - [Data Structures](#data-structures)
 > - [API](#api)
->   - [can.RBTreeList](#canrbtreelist)
+>   - [`can.RBTreeList`](#canrbtreelist)
 >     - [`.attr()`](#attr)
 >     - [`.batchSet()`](#batchset)
 >     - [`.deleteAttr()`](#deleteattr)
@@ -27,9 +27,9 @@ for use in CanJS' [can-derive plugin](https://github.com/canjs/can-derive).
 >     - [`.replace()`](#replace)
 >     - [`.splice()`](#splice)
 >     - [`.unshift()`](#unshift)
->   - [can.RBTreeList.Node](#canrbtreelistnode)
->   - [can.RBTree](#canrbtree)
->   - [can.BinTree](#canbintree)
+>   - [`can.RBTreeList.Node`](#canrbtreelistnode)
+>   - [`can.RBTree`](#canrbtree)
+>   - [`can.BinTree`](#canbintree)
 > - [Contributing](#contributing)
 
 
