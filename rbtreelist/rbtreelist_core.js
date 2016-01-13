@@ -738,6 +738,15 @@ RBTreeList.prototype.unset = function (unsetIndex, remove) {
     if (found !== null) {
         this._removeNode(found, node, remove);
         this._emptyIndexOfNodeCache();
+
+    } else {
+
+        // If this is a remove and there's a gap, decrement it
+        if (remove && node.leftGapCount > 0) {
+            node.leftGapCount--;
+            node.parent && node.parent.updateChildCount();
+            this._emptyIndexOfNodeCache();
+        }
     }
 
     // Update root and make it black

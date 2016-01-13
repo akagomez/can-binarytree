@@ -61,8 +61,8 @@ RBTreeList = can.List.extend(can.simpleExtend(rbTreeCoreProto, {
         var node = this.get(index);
 
         if (node) {
-            // Get the actual index not taking into consideration the
-            // consideration the comparator
+            // Get the actual calculated index, not the index used to
+            // find the node which is dependent on the comparator used
             removeIndex = this.indexOfNode(node);
 
             // Notify interested parties that we are going
@@ -76,12 +76,12 @@ RBTreeList = can.List.extend(can.simpleExtend(rbTreeCoreProto, {
                 // WARNING: This event cannot be batched, which is why we
                 // don't call `can.batch.trigger` or `this._triggerChange`.
                 // If it was the remove would happen before the bound RBTreeList
-                // recieved this event,
+                // recieved this event
                 can.trigger(this, 'pre-remove', [[node], index]);
             }
-
-            RBTreeCore.prototype.unset.apply(this, arguments);
         }
+
+        RBTreeCore.prototype.unset.apply(this, arguments);
 
         // Only fire a remove event if the length has changed
         if (this.length < lastLength) {

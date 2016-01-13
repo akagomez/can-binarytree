@@ -915,3 +915,13 @@ test('.filter() returns subset of values', function () {
     equal(filtered.length, 1, '"length" is correct');
     equal(filtered.attr(0), 'b', 'Contains the correct value');
 });
+
+test('Uninintialized values can be removed', function () {
+    var tree = new RBTreeList();
+    tree.attr(0, 'a');
+    tree.attr(2, 'b');
+    tree.removeAttr(1);
+
+    equal(tree.attr(1), 'b', 'Uninintialized index removed');
+    equal(tree.attr()[1], 'b', 'Cache updated');
+});
