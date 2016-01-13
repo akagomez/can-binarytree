@@ -138,11 +138,13 @@ Returns the `can.RBTreeList`.
 
 #### .deleteAttr()
 
-`rbTreeList.removeAttr(index) -> Object`
+`rbTreeList.deleteAttr(index) -> Object`
 
-Removes the node at the specified `index` without decrementing the indices of
-of all subsequent items in the `RBTreeList` by 1. This resulting `index`
-will not be iterable with `.each()` until it is set or removed.
+Removes the node at the specified `index` without affecting the `length` of
+the `RBTreeList` in the same way that the [delete operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/delete#Deleting_array_elements)
+affects a Javascript array. The resulting `index` will not
+be iterable with `.each()` until it is set or removed.
+
 
 Returns the value of the node's `data` property that was removed.
 
@@ -217,8 +219,8 @@ Returns the `length` of the `can.RBTreeList`.
 
 `rbTreeList.removeAttr(index) -> Object`
 
-Removes the node at the specified `index` while decrementing the indices of
-of all subsequent items in the `RBTreeList` by 1.
+Removes the node at the specified `index` and decrements the `length` of
+the `RBTreeList` by 1.
 
 Returns the value of the node's `data` property that was removed.
 
