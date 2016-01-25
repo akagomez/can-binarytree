@@ -90,7 +90,7 @@ tree.push('Jump'); // Node {id: 4, parent: Node, data: "Jump", left: null, right
 - RBTree - A self-balancing binary tree that serves as a key-value store
 - BinTree - A binary tree that is not balanced
 
-Note: Currently, the only data structure in the package that is observable is
+Note: Currently the only data structure in the package that is observable is
 the `can.RBTreeList`.
 
 
