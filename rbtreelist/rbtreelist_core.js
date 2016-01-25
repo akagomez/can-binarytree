@@ -744,7 +744,9 @@ RBTreeList.prototype.unset = function (unsetIndex, remove) {
         // If this is a remove and there's a gap, decrement it
         if (remove && node.leftGapCount > 0) {
             node.leftGapCount--;
-            node.parent && node.parent.updateChildCount();
+            if (node.parent) {
+                node.parent.updateChildCount();
+            }
             this._emptyIndexOfNodeCache();
         }
     }
