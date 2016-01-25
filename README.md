@@ -6,29 +6,35 @@
 implementations provided by [@vadimg](https://github.com/vadimg/js_bintrees)
 and and mixes in features of CanJS that make the data structures observable.
 
-> - [Install](#install)
-> - [Use](#use)
-> - [Data Structures](#data-structures)
-> - [API](#api)
->   - [`can.RBTreeList`](#canrbtreelist)
->     - [`.attr()`](#attr)
->     - [`.batchSet()`](#batchset)
->     - [`.deleteAttr()`](#deleteattr)
->     - [`.each()`](#each)
->     - [`.eachNode()`](#eachnode)
->     - [`.filter()`](#filter)
->     - [`.indexOf()`](#indexof)
->     - [`.indexOfNode()`](#indexofnode)
->     - [`.map()`](#map)
->     - [`.push()`](#push)
->     - [`.removeAttr()`](#removeattr)
->     - [`.replace()`](#replace)
->     - [`.splice()`](#splice)
->     - [`.unshift()`](#unshift)
->   - [`can.RBTreeList.Node`](#canrbtreelistnode)
->   - [`can.RBTree`](#canrbtree)
->   - [`can.BinTree`](#canbintree)
-> - [Contributing](#contributing)
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Install](#install)
+- [Use](#use)
+- [Data Structures](#data-structures)
+- [API](#api)
+  - [can.RBTreeList](#canrbtreelist)
+    - [.attr()](#attr)
+    - [.batchSet()](#batchset)
+    - [.deleteAttr()](#deleteattr)
+    - [.each()](#each)
+    - [.eachNode()](#eachnode)
+    - [.filter()](#filter)
+    - [.indexOf()](#indexof)
+    - [.indexOfNode()](#indexofnode)
+    - [.map()](#map)
+    - [.push()](#push)
+    - [.removeAttr()](#removeattr)
+    - [.replace()](#replace)
+    - [.splice()](#splice)
+    - [.unshift()](#unshift)
+  - [can.RBTreeList.Node](#canrbtreelistnode)
+  - [can.RBTree](#canrbtree)
+  - [can.BinTree](#canbintree)
+  - [can.Tree](#cantree)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
 
