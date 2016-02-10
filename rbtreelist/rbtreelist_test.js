@@ -613,6 +613,9 @@ test('Passing a NaN to set/get/or unset will not throw an error', function () {
 
 test('leftCount is maintained on set and unset', function () {
 
+    var tree = new RBTreeList();
+    var match;
+
     var recursiveChildCountTest = function (node, isChild) {
         var match = true;
         var count = 0;
@@ -667,9 +670,6 @@ test('leftCount is maintained on set and unset', function () {
             }
         }
     };
-
-    var tree = new RBTreeList();
-    var match;
 
     alphabet.forEach(function (letter, i) {
         tree.set(i, letter);
@@ -924,4 +924,15 @@ test('Uninintialized values can be removed', function () {
 
     equal(tree.attr(1), 'b', 'Uninintialized index removed');
     equal(tree.attr()[1], 'b', 'Cache updated');
+});
+
+test('Trees allow up to 1M nodes', function () {
+    var tree = new RBTreeList();
+    var length = 1000 * 1000; // 1M
+
+    for (var i = 0; i < length; i++) {
+        tree.push(i.toString(16));
+    }
+
+    equal(tree.attr('length'), length, 'Tree contains 1M nodes');
 });
