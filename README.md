@@ -1,5 +1,7 @@
 # can-binarytree
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-binarytree.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/canjs/can-binarytree.svg?branch=master)](https://travis-ci.org/canjs/can-binarytree)
 
 **can-binarytree** extends the very well written Javascript binary tree
