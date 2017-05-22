@@ -262,7 +262,7 @@ Returns the `length` of the `can.RBTreeList`.
 
 ### can.RBTreeList.Node
 
-A reference to the `Node` contstructor used internally by `can.RBTreeList` to
+A reference to the `Node` constructor used internally by `can.RBTreeList` to
 create nodes.
 
 
