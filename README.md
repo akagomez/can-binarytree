@@ -2,9 +2,9 @@
 
 [![Build Status](https://travis-ci.org/canjs/can-binarytree.svg?branch=master)](https://travis-ci.org/canjs/can-binarytree)
 
-**can-binarytree** extends the very well written Javascript binary tree
+**can-binarytree** extends the very well written JavaScript binary tree
 implementations provided by [@vadimg](https://github.com/vadimg/js_bintrees)
-and and mixes in features of CanJS that make the data structures observable.
+and mixes in features of CanJS that make the data structures observable.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -262,7 +262,7 @@ Returns the `length` of the `can.RBTreeList`.
 
 ### can.RBTreeList.Node
 
-A reference to the `Node` contstructor used internally by `can.RBTreeList` to
+A reference to the `Node` constructor used internally by `can.RBTreeList` to
 create nodes.
 
 
