@@ -2,7 +2,7 @@ var QUnit = require("steal-qunit");
 var RBTree = require('can-redblacktree');
 
 QUnit.module('can-redblacktree', {
-    setup: function () {}
+    beforeEach: function(assert) {}
 });
 
 var comparator = function (a, b) {
@@ -11,20 +11,20 @@ var comparator = function (a, b) {
     return a === b ? 0 : a < b ? -1 : 1; // ASC
 };
 
-test('Return index on insert', function () {
+QUnit.test('Return index on insert', function(assert) {
 
     var tree = new RBTree(comparator);
     var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
     alphabet.forEach(function (letter, index) {
         var value = tree.insert(letter);
-        deepEqual(value, index, 'Returned index of insert');
+        assert.deepEqual(value, index, 'Returned index of insert');
     });
 
-    deepEqual(tree.remove('404'), -1, 'Returned "not found" value');
+    assert.deepEqual(tree.remove('404'), -1, 'Returned "not found" value');
 });
 
-test('Return index on remove', function () {
+QUnit.test('Return index on remove', function(assert) {
 
     var tree = new RBTree(comparator);
     var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
@@ -37,13 +37,13 @@ test('Return index on remove', function () {
     // are tested
     for (var i = alphabet.length - 1; i >= 0; i--) {
         var value = tree.remove(alphabet[i]);
-        deepEqual(value, i, 'Returned index of remove');
+        assert.deepEqual(value, i, 'Returned index of remove');
     }
 
-    deepEqual(tree.remove('404'), -1, 'Returned "not found" value');
+    assert.deepEqual(tree.remove('404'), -1, 'Returned "not found" value');
 });
 
-test('Get index of item', function () {
+QUnit.test('Get index of item', function(assert) {
 
     var tree = new RBTree(comparator);
     var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
@@ -54,13 +54,13 @@ test('Get index of item', function () {
 
     alphabet.forEach(function (letter, index) {
         var value = tree.indexOf(letter);
-        deepEqual(value, index, 'Found index of value');
+        assert.deepEqual(value, index, 'Found index of value');
     });
 
-    deepEqual(tree.indexOf('404'), -1, 'Returned "not found" value');
+    assert.deepEqual(tree.indexOf('404'), -1, 'Returned "not found" value');
 });
 
-test('Get item by index', function () {
+QUnit.test('Get item by index', function(assert) {
 
     var tree = new RBTree(comparator);
     var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
@@ -71,13 +71,13 @@ test('Get item by index', function () {
 
     alphabet.forEach(function (letter, index) {
         var value = tree.getByIndex(index);
-        deepEqual(value, letter, 'Found value by index');
+        assert.deepEqual(value, letter, 'Found value by index');
     });
 
-    deepEqual(tree.getByIndex(100), null, 'Returned "not found" value');
+    assert.deepEqual(tree.getByIndex(100), null, 'Returned "not found" value');
 });
 
-test('leftCount is maintained on insert and remove', function () {
+QUnit.test('leftCount is maintained on insert and remove', function(assert) {
 
     var recursiveChildCountTest = function (node, isChild) {
         var match = true;
@@ -102,7 +102,7 @@ test('leftCount is maintained on insert and remove', function () {
                 match = false;
             }
 
-            deepEqual(count, storedCount, 'Count from "' + node.data + '"');
+            assert.deepEqual(count, storedCount, 'Count from "' + node.data + '"');
         }
 
         return (isChild ? count : match);
@@ -122,7 +122,7 @@ test('leftCount is maintained on insert and remove', function () {
                 letter = letter.shift();
                 tree.remove(letter);
                 match = recursiveChildCountTest(tree._root);
-                ok(match, 'Child count is correct after removing "' + letter + '"');
+                assert.ok(match, 'Child count is correct after removing "' + letter + '"');
                 i++;
             }
 
@@ -142,7 +142,7 @@ test('leftCount is maintained on insert and remove', function () {
     alphabet.forEach(function (letter) {
         tree.insert(letter);
         match = recursiveChildCountTest(tree._root);
-        ok(match, 'Child count is correct after adding "' + letter + '"');
+        assert.ok(match, 'Child count is correct after adding "' + letter + '"');
     });
 
     centerOutRemove(alphabet.length/2);

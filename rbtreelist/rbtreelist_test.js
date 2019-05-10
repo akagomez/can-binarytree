@@ -8,7 +8,7 @@ QUnit.module('can.RBTreeList');
 var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 // var alphabet = "ABCDEF".split("");
 
-test('Set value by index (natural order)', function () {
+QUnit.test('Set value by index (natural order)', function(assert) {
     var tree = new RBTreeList();
 
     alphabet.forEach(function (letter, i) {
@@ -23,14 +23,14 @@ test('Set value by index (natural order)', function () {
                 match = false;
             }
 
-            equal(alphabet[j], l, 'Correct position');
+            assert.equal(alphabet[j], l, 'Correct position');
         }
 
-        ok(match, 'Order is correct after set of "' + letter + '"');
+        assert.ok(match, 'Order is correct after set of "' + letter + '"');
     });
 });
 
-test('Passing an array to the constructor builds a tree as a batch', function () {
+QUnit.test('Passing an array to the constructor builds a tree as a batch', function(assert) {
     var values = [];
     for (var i = 0; i < 1000; i++) {
         values[i] = i.toString(16);
@@ -39,22 +39,22 @@ test('Passing an array to the constructor builds a tree as a batch', function ()
     var _set = RBTreeList.prototype.set;
 
     RBTreeList.prototype.set = function () {
-        ok(false, '.set() should not be called');
+        assert.ok(false, '.set() should not be called');
     };
 
     var tree = new RBTreeList(values);
 
     RBTreeList.prototype.set = _set;
 
-    ok(true, '.set() was not called');
-    equal(tree.attr('length'), values.length, 'Tree has the correct length');
+    assert.ok(true, '.set() was not called');
+    assert.equal(tree.attr('length'), values.length, 'Tree has the correct length');
 
     values.forEach(function (value, index) {
-        equal(tree.get(index).data, value, 'Tree has the correct value at the correct index');
+        assert.equal(tree.get(index).data, value, 'Tree has the correct value at the correct index');
     });
 });
 
-test('Add node with .push()', function () {
+QUnit.test('Add node with .push()', function(assert) {
     var tree = new RBTreeList();
 
     alphabet.forEach(function (letter, i) {
@@ -69,14 +69,14 @@ test('Add node with .push()', function () {
                 match = false;
             }
 
-            equal(alphabet[j], l, 'Correct position');
+            assert.equal(alphabet[j], l, 'Correct position');
         }
 
-        ok(match, 'Order is correct after set of "' + letter + '"');
+        assert.ok(match, 'Order is correct after set of "' + letter + '"');
     });
 });
 
-test('Set value by index (reverse order)', function () {
+QUnit.test('Set value by index (reverse order)', function(assert) {
     var tree = new RBTreeList();
 
     for (var i = alphabet.length - 1; i >= 0; i--) {
@@ -93,50 +93,50 @@ test('Set value by index (reverse order)', function () {
                 match = false;
             }
 
-            equal(alphabet[j], l, 'Correct position');
+            assert.equal(alphabet[j], l, 'Correct position');
         }
 
-        ok(match, 'Order is correct after set of "' + letter + '"');
+        assert.ok(match, 'Order is correct after set of "' + letter + '"');
     }
 });
 
-test('Set value by index (with gaps between indexes)', function () {
+QUnit.test('Set value by index (with gaps between indexes)', function(assert) {
     var tree = new RBTreeList();
 
     tree.set(20, alphabet[20]);
-    equal(tree.get(20).data, alphabet[20]);
+    assert.equal(tree.get(20).data, alphabet[20]);
 
     tree.set(5, alphabet[5]);
-    equal(tree.get(5).data, alphabet[5]);
+    assert.equal(tree.get(5).data, alphabet[5]);
 
     tree.set(15, alphabet[15]);
-    equal(tree.get(15).data, alphabet[15]);
+    assert.equal(tree.get(15).data, alphabet[15]);
 
     tree.set(10, alphabet[10]);
-    equal(tree.get(10).data, alphabet[10]);
+    assert.equal(tree.get(10).data, alphabet[10]);
 
     tree.set(12, alphabet[12]);
-    equal(tree.get(12).data, alphabet[12]);
+    assert.equal(tree.get(12).data, alphabet[12]);
 
     tree.set(11, alphabet[11]);
-    equal(tree.get(11).data, alphabet[11]);
+    assert.equal(tree.get(11).data, alphabet[11]);
 });
 
-test('Gaps are calculated correctly', function () {
+QUnit.test('Gaps are calculated correctly', function(assert) {
     var tree = new RBTreeList();
     var node;
 
     node = tree.set(5, alphabet[5]);
-    equal(node.leftGapCount, 5);
+    assert.equal(node.leftGapCount, 5);
     node = tree.set(10, alphabet[10]);
-    equal(node.leftGapCount, 4);
+    assert.equal(node.leftGapCount, 4);
     node = tree.set(15, alphabet[15]);
-    equal(node.leftGapCount, 4);
+    assert.equal(node.leftGapCount, 4);
     node = tree.set(20, alphabet[20]);
-    equal(node.leftGapCount, 4);
+    assert.equal(node.leftGapCount, 4);
 });
 
-test('Gaps can be disabled (natural order)', function () {
+QUnit.test('Gaps can be disabled (natural order)', function(assert) {
     var tree = new RBTreeList();
     var index = 0;
     var modelList = [];
@@ -156,11 +156,11 @@ test('Gaps can be disabled (natural order)', function () {
     // Make sure index reported is of the filtered list, not the alphabet
     tree.bind('add', function (ev, items, offset) {
 
-        ok(items.length, 1, 'Only one item was added');
+        assert.ok(items.length, 1, 'Only one item was added');
 
         items.forEach(function (node, index) {
             var value = node.data;
-            equal(offset + index, modelList.indexOf(value),
+            assert.equal(offset + index, modelList.indexOf(value),
                 'Add event reports correct index');
         });
     });
@@ -173,16 +173,16 @@ test('Gaps can be disabled (natural order)', function () {
         var treeIndex = tree.indexOfNode(node);
         var modelIndex = modelList.indexOf(letter);
 
-        equal(node.data, letter, 'Value matches');
-        equal(treeIndex, modelIndex, 'Index excludes gap');
-        equal(tree.length, modelList.length, 'Length matches modelList');
+        assert.equal(node.data, letter, 'Value matches');
+        assert.equal(treeIndex, modelIndex, 'Index excludes gap');
+        assert.equal(tree.length, modelList.length, 'Length matches modelList');
 
         index++;
     }
 
 });
 
-test('Gaps can be disabled (reverse order)', function () {
+QUnit.test('Gaps can be disabled (reverse order)', function(assert) {
     var tree = new RBTreeList();
     var length = 1;
 
@@ -202,16 +202,16 @@ test('Gaps can be disabled (reverse order)', function () {
         var letter = alphabet[i];
         var node = tree.set(i, letter);
 
-        equal(node.data, letter, 'Value matches');
-        equal(tree.indexOfNode(node), 0, 'Index excludes gap');
-        equal(tree.length, length, 'Length matches gapless index + 1');
+        assert.equal(node.data, letter, 'Value matches');
+        assert.equal(tree.indexOfNode(node), 0, 'Index excludes gap');
+        assert.equal(tree.length, length, 'Length matches gapless index + 1');
 
         length++;
     }
 });
 
 
-test('Setting the value of gappped index doesn\'t effect subsequent indices' , function () {
+QUnit.test('Setting the value of gappped index doesn\'t effect subsequent indices' , function(assert) {
     var tree = new RBTreeList();
 
     var node1 = tree.set(25, alphabet[25]);
@@ -219,13 +219,13 @@ test('Setting the value of gappped index doesn\'t effect subsequent indices' , f
     var node3 = tree.set(15, alphabet[15]);
     var node4 = tree.set(10, alphabet[10]);
 
-    equal(tree.indexOfNode(node1), 25);
-    equal(tree.indexOfNode(node2), 20);
-    equal(tree.indexOfNode(node3), 15);
-    equal(tree.indexOfNode(node4), 10);
+    assert.equal(tree.indexOfNode(node1), 25);
+    assert.equal(tree.indexOfNode(node2), 20);
+    assert.equal(tree.indexOfNode(node3), 15);
+    assert.equal(tree.indexOfNode(node4), 10);
 });
 
-test('Set single value via .splice()', function () {
+QUnit.test('Set single value via .splice()', function(assert) {
     var tree = new RBTreeList();
 
     alphabet.forEach(function (letter, i) {
@@ -240,25 +240,25 @@ test('Set single value via .splice()', function () {
                 match = false;
             }
 
-            equal(alphabet[j], l, 'Correct position');
+            assert.equal(alphabet[j], l, 'Correct position');
         }
 
-        ok(match, 'Order is correct after splice of "' + letter + '"');
+        assert.ok(match, 'Order is correct after splice of "' + letter + '"');
     });
 });
 
-test('Set multiple values via .splice()', function () {
+QUnit.test('Set multiple values via .splice()', function(assert) {
     var tree = new RBTreeList();
 
     // Fill the tree with values
     tree.splice.apply(tree, [0, 0].concat(alphabet));
 
     alphabet.forEach(function (letter, i) {
-        equal(tree.get(i).data, letter, 'Values match');
+        assert.equal(tree.get(i).data, letter, 'Values match');
     });
 });
 
-test('Insert a value between two existing values via .splice()', function () {
+QUnit.test('Insert a value between two existing values via .splice()', function(assert) {
 
     var tree = new RBTreeList();
     var splicedValue = '<- find me ->';
@@ -270,12 +270,12 @@ test('Insert a value between two existing values via .splice()', function () {
 
     tree.splice(middleIndex, 0, splicedValue);
 
-    equal(tree.get(middleIndex - 1).data, alphabet[middleIndex - 1]);
-    equal(tree.get(middleIndex).data, splicedValue);
-    equal(tree.get(middleIndex + 1).data, alphabet[middleIndex]);
+    assert.equal(tree.get(middleIndex - 1).data, alphabet[middleIndex - 1]);
+    assert.equal(tree.get(middleIndex).data, splicedValue);
+    assert.equal(tree.get(middleIndex + 1).data, alphabet[middleIndex]);
 });
 
-test('Delete an item via .unset()', function () {
+QUnit.test('Delete an item via .unset()', function(assert) {
     var tree = new RBTreeList();
 
     // Fill the tree with values
@@ -286,13 +286,13 @@ test('Delete an item via .unset()', function () {
     });
 
     tree.each(function () {
-        ok(false, 'There should be nothing to iterate');
+        assert.ok(false, 'There should be nothing to iterate');
     });
 
-    equal(tree.length, alphabet.length, 'Tree length is correct');
+    assert.equal(tree.length, alphabet.length, 'Tree length is correct');
 });
 
-test('Remove an item via .unset()', function () {
+QUnit.test('Remove an item via .unset()', function(assert) {
     var tree = new RBTreeList();
 
     // Fill the tree with values
@@ -303,28 +303,28 @@ test('Remove an item via .unset()', function () {
     }
 
     tree.each(function () {
-        ok(false, 'There should be nothing to iterate');
+        assert.ok(false, 'There should be nothing to iterate');
     });
 
-    equal(tree.length, 0, 'Tree length is correct');
+    assert.equal(tree.length, 0, 'Tree length is correct');
 });
 
-test('Removing a gapped item yields correct length', function () {
+QUnit.test('Removing a gapped item yields correct length', function(assert) {
     var tree = new RBTreeList();
     var modelList = [];
 
     modelList[100] = 'abc';
     tree.set(100, 'abc');
 
-    equal(tree.length, modelList.length, 'Length is correct after insert');
+    assert.equal(tree.length, modelList.length, 'Length is correct after insert');
 
     delete modelList[100];
     tree.unset(100);
 
-    equal(tree.length, modelList.length, 'Length is correct after remove');
+    assert.equal(tree.length, modelList.length, 'Length is correct after remove');
 });
 
-test('Removing a node links the prev/next nodes', function () {
+QUnit.test('Removing a node links the prev/next nodes', function(assert) {
     var tree = new RBTreeList();
 
     // Fill the tree with values
@@ -338,11 +338,11 @@ test('Removing a node links the prev/next nodes', function () {
     tree.unset(rootIndex);
 
     // NOTE: Don't use .equal() to compare nodes, it causes endless recursion
-    ok(prev.next === next, '`prev` node was linked to `next` node');
-    ok(next.prev === prev, '`next` node was linked ot `prev` node');
+    assert.ok(prev.next === next, '`prev` node was linked to `next` node');
+    assert.ok(next.prev === prev, '`next` node was linked ot `prev` node');
 });
 
-test('Removing a gapped item redistributes the gap', function () {
+QUnit.test('Removing a gapped item redistributes the gap', function(assert) {
     var tree = new RBTreeList();
     var next;
 
@@ -359,11 +359,11 @@ test('Removing a gapped item redistributes the gap', function () {
 
     tree.unset(10);
 
-    equal(next.leftGapCount, 17,
+    assert.equal(next.leftGapCount, 17,
         'Removed item\'s next sibling is gapped correctly');
 });
 
-test('Remove a single value via .splice()', function () {
+QUnit.test('Remove a single value via .splice()', function(assert) {
     var tree = new RBTreeList();
     var length = alphabet.length;
 
@@ -374,25 +374,25 @@ test('Remove a single value via .splice()', function () {
     // "removed items" list
     var removedNode = tree.splice(length - 1, 1).shift();
 
-    equal(removedNode.data, alphabet[length - 1], 'Removed node matches');
+    assert.equal(removedNode.data, alphabet[length - 1], 'Removed node matches');
 
     var nodeAtRemovedIndex = tree.get(length - 1);
 
-    ok(nodeAtRemovedIndex === null, 'Node removed from tree');
+    assert.ok(nodeAtRemovedIndex === null, 'Node removed from tree');
 
     // Remove the first value, then get the node from the returned
     // "removed items" list
     removedNode = tree.splice(0, 1).shift();
 
-    equal(removedNode.data, alphabet[0], 'Removed node matches');
+    assert.equal(removedNode.data, alphabet[0], 'Removed node matches');
 
     // Should return the NEXT item in the list, after the removed item
     var dataAtRemovedIndex = tree.get(0).data;
 
-    ok(dataAtRemovedIndex === alphabet[1], 'Node removed from tree');
+    assert.ok(dataAtRemovedIndex === alphabet[1], 'Node removed from tree');
 });
 
-test('Remove multiple values via .splice()', function () {
+QUnit.test('Remove multiple values via .splice()', function(assert) {
     var tree = new RBTreeList();
     var modelList = alphabet.slice(0);
     var length = alphabet.length;
@@ -403,20 +403,20 @@ test('Remove multiple values via .splice()', function () {
     var removedNodes = tree.splice(1, length - 2);
     var removedLetters = modelList.splice(1, length - 2);
 
-    equal(removedNodes.length, removedLetters.length,
+    assert.equal(removedNodes.length, removedLetters.length,
         'Correct number of nodes removed');
 
     removedNodes.forEach(function (node, i) {
         i = i+1;
 
-        equal(node.data, alphabet[i], 'Removed values match');
+        assert.equal(node.data, alphabet[i], 'Removed values match');
     });
 
-    equal(tree.get(0).data, modelList[0], 'Remaining values match');
-    equal(tree.get(1).data, modelList[1], 'Remaining values match');
+    assert.equal(tree.get(0).data, modelList[0], 'Remaining values match');
+    assert.equal(tree.get(1).data, modelList[1], 'Remaining values match');
 });
 
-test('Replacing a value with .splice() creates a new Node', function () {
+QUnit.test('Replacing a value with .splice() creates a new Node', function(assert) {
     var tree = new RBTreeList();
 
     // Fill the tree with values
@@ -424,11 +424,11 @@ test('Replacing a value with .splice() creates a new Node', function () {
 
     var removedNode = tree.splice(0, 1, alphabet[0]).shift();
 
-    notDeepEqual(removedNode, tree.get(0).data, 'Nodes are not the same');
-    equal(removedNode.data, tree.get(0).data, 'Node values are the same');
+    assert.notDeepEqual(removedNode, tree.get(0).data, 'Nodes are not the same');
+    assert.equal(removedNode.data, tree.get(0).data, 'Node values are the same');
 });
 
-test('Negative removeCount works with .splice()', function () {
+QUnit.test('Negative removeCount works with .splice()', function(assert) {
     var tree = new RBTreeList();
 
     // Fill the tree with values
@@ -439,15 +439,15 @@ test('Negative removeCount works with .splice()', function () {
     removedNodes.forEach(function (node, i) {
         i = alphabet.length - 3 + i;
 
-        equal(node.data, alphabet[i], 'Removed values match');
+        assert.equal(node.data, alphabet[i], 'Removed values match');
     });
 
     for (var i = 0; i < alphabet.length - 3; i++) {
-        equal(tree.get(i).data, alphabet[i], 'Remaining values match');
+        assert.equal(tree.get(i).data, alphabet[i], 'Remaining values match');
     }
 });
 
-test('Insert and remove simultaneously with .splice()', function () {
+QUnit.test('Insert and remove simultaneously with .splice()', function(assert) {
     var tree = new RBTreeList();
     var replaceIndex = 3;
     var doubledValue = alphabet[replaceIndex] + alphabet[replaceIndex];
@@ -457,15 +457,15 @@ test('Insert and remove simultaneously with .splice()', function () {
 
     var removedNode = tree.splice(replaceIndex, 1, doubledValue).shift();
 
-    equal(removedNode.data, alphabet[replaceIndex],
+    assert.equal(removedNode.data, alphabet[replaceIndex],
         'Removed value matches');
 
     var node = tree.get(replaceIndex);
 
-    equal(node.data, doubledValue, 'Inserted value matches');
+    assert.equal(node.data, doubledValue, 'Inserted value matches');
 });
 
-test('Nodes are linked (parent, prev, next)', function () {
+QUnit.test('Nodes are linked (parent, prev, next)', function(assert) {
     var tree = new RBTreeList();
     var modelList = [];
     var cursor, node, parent;
@@ -475,14 +475,14 @@ test('Nodes are linked (parent, prev, next)', function () {
         modelList[i] = letter;
         node = tree.set(i, letter);
 
-        equal(node.data, letter, '"' + letter + '" set');
+        assert.equal(node.data, letter, '"' + letter + '" set');
 
         cursor = tree.first();
         i = 0;
 
         while (cursor) {
 
-            equal(cursor.data, alphabet[i], 'Next node matches model');
+            assert.equal(cursor.data, alphabet[i], 'Next node matches model');
 
             parent = cursor;
 
@@ -491,7 +491,7 @@ test('Nodes are linked (parent, prev, next)', function () {
                 parent = parent.parent;
             }
 
-            ok(parent === tree._root, 'Reached root via linked parent');
+            assert.ok(parent === tree._root, 'Reached root via linked parent');
 
             // Iterate nodes via link
             cursor = cursor.next;
@@ -503,7 +503,7 @@ test('Nodes are linked (parent, prev, next)', function () {
 
         while (cursor) {
 
-            equal(cursor.data, modelList[i], 'Prev node matches model');
+            assert.equal(cursor.data, modelList[i], 'Prev node matches model');
 
             parent = cursor;
 
@@ -512,7 +512,7 @@ test('Nodes are linked (parent, prev, next)', function () {
                 parent = parent.parent;
             }
 
-            ok(parent === tree._root, 'Reached root via linked parent');
+            assert.ok(parent === tree._root, 'Reached root via linked parent');
 
             // Iterate nodes via link
             cursor = cursor.prev;
@@ -521,29 +521,29 @@ test('Nodes are linked (parent, prev, next)', function () {
     });
 });
 
-test('Get the index of a node', function () {
+QUnit.test('Get the index of a node', function(assert) {
     var tree = new RBTreeList();
 
     // Fill the tree with values
     tree.splice.apply(tree, [0, 0].concat(alphabet));
 
     tree.eachNode(function (node, i) {
-        equal(tree.indexOfNode(node), i, 'Index is correct');
+        assert.equal(tree.indexOfNode(node), i, 'Index is correct');
     });
 });
 
-test('Get the index of a value', function () {
+QUnit.test('Get the index of a value', function(assert) {
     var tree = new RBTreeList();
 
     // Fill the tree with values
     tree.splice.apply(tree, [0, 0].concat(alphabet));
 
     alphabet.forEach(function (letter, i) {
-        equal(tree.indexOf(letter), i, 'Index is correct');
+        assert.equal(tree.indexOf(letter), i, 'Index is correct');
     });
 });
 
-test('Uninintialized indexes are not enumerable', function () {
+QUnit.test('Uninintialized indexes are not enumerable', function(assert) {
     var tree = new RBTreeList();
     var expected;
 
@@ -553,18 +553,18 @@ test('Uninintialized indexes are not enumerable', function () {
     expected[2] = 'C';
 
     expected.forEach(function (value, index) {
-        equal(tree.get(index).data, value);
+        assert.equal(tree.get(index).data, value);
     });
 
     tree.set(0, undefined);
 
     expected = [undefined, 'C'];
     tree.each(function (value, i) {
-        equal(value, expected.shift());
+        assert.equal(value, expected.shift());
     });
 });
 
-test('Iterable with can.each()', function () {
+QUnit.test('Iterable with can.each()', function(assert) {
     var tree = new RBTreeList();
     var expected = alphabet.slice();
 
@@ -573,11 +573,11 @@ test('Iterable with can.each()', function () {
 
     // Iterate values, not nodes
     can.each(tree, function (letter, index) {
-        equal(letter, expected[index], 'Value matches');
+        assert.equal(letter, expected[index], 'Value matches');
     });
 });
 
-test('Remove value by index', function () {
+QUnit.test('Remove value by index', function(assert) {
     var tree = new RBTreeList();
     var n;
 
@@ -587,31 +587,31 @@ test('Remove value by index', function () {
 
     for (var i = alphabet.length - 1; i >= 0; i--) {
         n = tree.unset(i);
-        equal(n.data, alphabet[i], 'Correct item removed');
+        assert.equal(n.data, alphabet[i], 'Correct item removed');
     }
 });
 
-test('Passing a NaN to .set() will not throw an error', function () {
+QUnit.test('Passing a NaN to .set() will not throw an error', function(assert) {
     var tree = new RBTreeList();
     tree.set('foo', 'bar');
-    ok('No error was thrown');
+    assert.ok('No error was thrown');
 });
 
-test('Passing a NaN to set/get/or unset will not throw an error', function () {
+QUnit.test('Passing a NaN to set/get/or unset will not throw an error', function(assert) {
     var tree = new RBTreeList();
 
     tree.set('foo', 'bar');
     tree.get('boo');
     tree.unset('goo');
 
-    ok(true, 'No error was thrown');
-    equal(tree.attr('length'), 0, 'Length is zero');
-    equal(tree._root, null, 'The list contains no items');
+    assert.ok(true, 'No error was thrown');
+    assert.equal(tree.attr('length'), 0, 'Length is zero');
+    assert.equal(tree._root, null, 'The list contains no items');
 });
 
 
 
-test('leftCount is maintained on set and unset', function () {
+QUnit.test('leftCount is maintained on set and unset', function(assert) {
 
     var tree = new RBTreeList();
     var match;
@@ -639,7 +639,7 @@ test('leftCount is maintained on set and unset', function () {
                 match = false;
             }
 
-            equal(count, storedCount, 'Count from "' + node.data + '"');
+            assert.equal(count, storedCount, 'Count from "' + node.data + '"');
         }
 
         return (isChild ? count : match);
@@ -659,7 +659,7 @@ test('leftCount is maintained on set and unset', function () {
                 letter = letter.shift();
                 tree.unset(index, true);
                 match = recursiveChildCountTest(tree._root);
-                ok(match, 'Child count is correct after removing "' + letter + '"');
+                assert.ok(match, 'Child count is correct after removing "' + letter + '"');
                 i++;
             }
 
@@ -674,21 +674,21 @@ test('leftCount is maintained on set and unset', function () {
     alphabet.forEach(function (letter, i) {
         tree.set(i, letter);
         match = recursiveChildCountTest(tree._root);
-        ok(match, 'Child count is correct after adding "' + letter + '"');
+        assert.ok(match, 'Child count is correct after adding "' + letter + '"');
     });
 
     centerOutRemove(alphabet.length/2);
 
 });
 
-test('Set/get/unset 10k items (by known index)', function () {
+QUnit.test('Set/get/unset 10k items (by known index)', function(assert) {
     var url = '../fixtures/10k';
     var req = new XMLHttpRequest();
 
-    QUnit.stop();
+    var done = assert.async();
 
     req.addEventListener('load', function () {
-        QUnit.start();
+        done();
 
         var operations = this.responseText.split('\n');
         var modelList = [];
@@ -703,21 +703,21 @@ test('Set/get/unset 10k items (by known index)', function () {
                 modelList[index] = index;
 
                 node = tree.set(index, index);
-                ok(node instanceof RBTreeList.prototype.Node, '.set() returned a Node');
-                equal(node.data, index, '.set()\'s returned node has correct data');
+                assert.ok(node instanceof RBTreeList.prototype.Node, '.set() returned a Node');
+                assert.equal(node.data, index, '.set()\'s returned node has correct data');
 
                 node = tree.get(index);
-                ok(node instanceof RBTreeList.prototype.Node, 'Get returned a Node');
-                equal(node.data, index, '.get()\'s returned node has correct data');
+                assert.ok(node instanceof RBTreeList.prototype.Node, 'Get returned a Node');
+                assert.equal(node.data, index, '.get()\'s returned node has correct data');
             } else {
                 delete modelList[index];
 
                 node = tree.unset(index);
-                ok(node instanceof RBTreeList.prototype.Node, 'Remove returned a Node');
-                equal(node.data, index, 'Removed node has correct data');
+                assert.ok(node instanceof RBTreeList.prototype.Node, 'Remove returned a Node');
+                assert.equal(node.data, index, 'Removed node has correct data');
             }
 
-            equal(tree.length, modelList.length, 'Length is correct');
+            assert.equal(tree.length, modelList.length, 'Length is correct');
         });
     });
 
@@ -725,7 +725,7 @@ test('Set/get/unset 10k items (by known index)', function () {
     req.send();
 });
 
-test('Add/remove 1k items (by indexOf)', function () {
+QUnit.test('Add/remove 1k items (by indexOf)', function(assert) {
 
     var iterations = 1000;
     var tree = new RBTreeList();
@@ -748,7 +748,7 @@ test('Add/remove 1k items (by indexOf)', function () {
             index = tree.indexOf(value);
             modelIndex = modelList.indexOf(value);
 
-            equal(index, modelIndex, 'Value was saved at correct index');
+            assert.equal(index, modelIndex, 'Value was saved at correct index');
         } else {
             modelIndex = modelList.indexOf(value);
             modelRemoved = modelList.splice(modelIndex, 1);
@@ -756,36 +756,36 @@ test('Add/remove 1k items (by indexOf)', function () {
             treeIndex = tree.indexOf(value);
             treeRemoved = tree.splice(treeIndex, 1);
 
-            equal(treeIndex, modelIndex, 'Indices match');
+            assert.equal(treeIndex, modelIndex, 'Indices match');
 
             for (j = 0; j <  modelRemoved.length; j++) {
-                equal(treeRemoved[j].data, modelRemoved[j], 'Removed item matches model');
+                assert.equal(treeRemoved[j].data, modelRemoved[j], 'Removed item matches model');
             }
         }
 
-        equal(tree.length, modelList.length, 'Length is correct');
+        assert.equal(tree.length, modelList.length, 'Length is correct');
     }
 
 });
 
-test('Set the value at an index using attr([index], [value])', function () {
+QUnit.test('Set the value at an index using attr([index], [value])', function(assert) {
     var collection = new RBTreeList();
     collection.attr(0, 'a');
     collection.attr(1, 'b');
     collection.attr(2, 'c');
-    equal(collection.attr(0), 'a', 'Got value using .attr()');
-    equal(collection.attr(1), 'b', 'Got value using .attr()');
-    equal(collection.attr(2), 'c', 'Got value using .attr()');
+    assert.equal(collection.attr(0), 'a', 'Got value using .attr()');
+    assert.equal(collection.attr(1), 'b', 'Got value using .attr()');
+    assert.equal(collection.attr(2), 'c', 'Got value using .attr()');
 });
 
-test('Get the value at an index using attr([index])', function () {
+QUnit.test('Get the value at an index using attr([index])', function(assert) {
     var collection = new RBTreeList(['a', 'b', 'c']);
-    equal(collection.attr(0), 'a', 'Got value using .attr()');
-    equal(collection.attr(1), 'b', 'Got value using .attr()');
-    equal(collection.attr(2), 'c', 'Got value using .attr()');
+    assert.equal(collection.attr(0), 'a', 'Got value using .attr()');
+    assert.equal(collection.attr(1), 'b', 'Got value using .attr()');
+    assert.equal(collection.attr(2), 'c', 'Got value using .attr()');
 });
 
-test('Calling .each in a compute will bind to length', function () {
+QUnit.test('Calling .each in a compute will bind to length', function(assert) {
     var source = new RBTreeList(['a', 'b', 'c']);
 
     // Copy the list
@@ -802,17 +802,17 @@ test('Calling .each in a compute will bind to length', function () {
     cloneCompute.bind('change', can.noop);
 
     var clone = cloneCompute();
-    equal(clone[0], 'a', 'Cloned index matches source index');
-    equal(clone[1], 'b', 'Cloned index matches source index');
-    equal(clone[2], 'c', 'Cloned index matches source index');
+    assert.equal(clone[0], 'a', 'Cloned index matches source index');
+    assert.equal(clone[1], 'b', 'Cloned index matches source index');
+    assert.equal(clone[2], 'c', 'Cloned index matches source index');
 
     source.push('d');
 
     clone = cloneCompute();
-    equal(clone[3], 'd', 'Cloned index matches source index');
+    assert.equal(clone[3], 'd', 'Cloned index matches source index');
 });
 
-test('batchSet\'s match their progressively inserted equivalents', function () {
+QUnit.test('batchSet\'s match their progressively inserted equivalents', function(assert) {
 
     var constructorValues = [
         13,6,20,3,10,17,24,1,5,8,12,15,19,22,26,0,2,4,7,9,11,14,16,18,21,23,25];
@@ -849,25 +849,25 @@ test('batchSet\'s match their progressively inserted equivalents', function () {
 
 
     controlTree.each(function (node, index) {
-        equal(testTree.get(index).value, node.value, 'Values match');
+        assert.equal(testTree.get(index).value, node.value, 'Values match');
     });
 
-    equal(testTree.length, controlTree.length, 'Length matches');
+    assert.equal(testTree.length, controlTree.length, 'Length matches');
 });
 
-test('.removeAttr() removes a key/value', function () {
+QUnit.test('.removeAttr() removes a key/value', function(assert) {
     var tree = new RBTreeList(['a', 'b', 'c']);
     var expected = new can.List(['a', 'b', 'c']);
 
     var returned = tree.removeAttr(1);
     expected.removeAttr(1);
 
-    equal(tree.attr(1), expected.attr(1), 'Value at index was removed');
-    deepEqual(returned, 'b', 'Returned an array of removed values');
+    assert.equal(tree.attr(1), expected.attr(1), 'Value at index was removed');
+    assert.deepEqual(returned, 'b', 'Returned an array of removed values');
 });
 
 
-test('.deleteAttr() creates a sparse array', function () {
+QUnit.test('.deleteAttr() creates a sparse array', function(assert) {
     var tree = new RBTreeList(['a', 'b', 'c']);
     var expected = ['a', 'b', 'c'];
     var treeIterations = [];
@@ -876,7 +876,7 @@ test('.deleteAttr() creates a sparse array', function () {
     tree.deleteAttr(1);
     delete expected[1];
 
-    equal(tree.attr(1), expected[1], 'Value at index was uninintialized');
+    assert.equal(tree.attr(1), expected[1], 'Value at index was uninintialized');
 
     tree.each(function (value, index) {
         treeIterations.push(value);
@@ -886,47 +886,47 @@ test('.deleteAttr() creates a sparse array', function () {
         expectedIterations.push(value);
     });
 
-    equal(treeIterations.length, expectedIterations.length,
+    assert.equal(treeIterations.length, expectedIterations.length,
         'The correct number of indices where iterated');
 
-    deepEqual(treeIterations, expectedIterations, 'Iterated values match');
+    assert.deepEqual(treeIterations, expectedIterations, 'Iterated values match');
 });
 
 
-test('.attr() returns all values', function () {
+QUnit.test('.attr() returns all values', function(assert) {
     var expected = ['a', 'b', 'c'];
     var tree = new RBTreeList(expected);
     var values = tree.attr();
 
-    equal(values[0], expected[0], '1st value is correct');
-    equal(values[1], expected[1], '2nd value is correct');
-    equal(values[2], expected[2], '3rd value is correct');
-    equal(values.length, expected.length, '"length" is correct');
+    assert.equal(values[0], expected[0], '1st value is correct');
+    assert.equal(values[1], expected[1], '2nd value is correct');
+    assert.equal(values[2], expected[2], '3rd value is correct');
+    assert.equal(values.length, expected.length, '"length" is correct');
 });
 
-test('.filter() returns subset of values', function () {
+QUnit.test('.filter() returns subset of values', function(assert) {
     var tree = new RBTreeList(['a', 'b', 'c']);
 
     var filtered = tree.filter(function (letter) {
         return letter === 'b';
     });
 
-    ok(filtered instanceof can.RBTreeList, 'Is an RBTreeList');
-    equal(filtered.length, 1, '"length" is correct');
-    equal(filtered.attr(0), 'b', 'Contains the correct value');
+    assert.ok(filtered instanceof can.RBTreeList, 'Is an RBTreeList');
+    assert.equal(filtered.length, 1, '"length" is correct');
+    assert.equal(filtered.attr(0), 'b', 'Contains the correct value');
 });
 
-test('Uninintialized values can be removed', function () {
+QUnit.test('Uninintialized values can be removed', function(assert) {
     var tree = new RBTreeList();
     tree.attr(0, 'a');
     tree.attr(2, 'b');
     tree.removeAttr(1);
 
-    equal(tree.attr(1), 'b', 'Uninintialized index removed');
-    equal(tree.attr()[1], 'b', 'Cache updated');
+    assert.equal(tree.attr(1), 'b', 'Uninintialized index removed');
+    assert.equal(tree.attr()[1], 'b', 'Cache updated');
 });
 
-test('Trees allow up to 1M nodes', function () {
+QUnit.test('Trees allow up to 1M nodes', function(assert) {
     var tree = new RBTreeList();
     var length = 1000 * 1000; // 1M
 
@@ -934,5 +934,5 @@ test('Trees allow up to 1M nodes', function () {
         tree.push(i.toString(16));
     }
 
-    equal(tree.attr('length'), length, 'Tree contains 1M nodes');
+    assert.equal(tree.attr('length'), length, 'Tree contains 1M nodes');
 });
